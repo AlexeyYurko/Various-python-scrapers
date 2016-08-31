@@ -1,1 +1,3 @@
-Python script &amp; grab the list of vape shops in the UK by the towns and nearby.
+#vape.py
+
+Python script for grabbing the list of vape shops in the UK by the towns and nearby.
