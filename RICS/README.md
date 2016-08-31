@@ -1,3 +1,3 @@
 http://www.ricsfirms.com
 
-Python script &amp; grab the list of surveyors in the UK.
+Python script for grabbing the list of surveyors in the UK.
