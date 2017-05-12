@@ -21,7 +21,7 @@ def has_inside(block):
 
 
 def get_social(block):
-    if block != None:
+    if block:
         return urllib.request.unquote(block.find('a').get('href'))
     else:
         return '#N/A'
@@ -35,7 +35,7 @@ cur.execute('''
 CREATE TABLE IF NOT EXISTS spa (url TEXT, name DATE, address TEXT, phone TEXT, email TEXT, www TEXT, facebook TEXT, twitter)''')
 
 urlbase = 'http://www.spaweek.com/spas/all-spas/0/?keywords=spa&t=&results=50&sort=&treatment=&p='
-urldetail = ("http://www.spaweek.com")
+urldetail = "http://www.spaweek.com"
 
 start_page = 1
 end_page = 70  # 70

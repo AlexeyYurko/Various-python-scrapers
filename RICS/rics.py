@@ -1,13 +1,13 @@
 # -*- coding: UTF-8 -*-
 
-from bs4 import BeautifulSoup
-from urllib.request import urlopen
-import urllib.request
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
+import re
 import sqlite3
 import time
-import re
+from urllib.request import urlopen
+
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 
 
 def has_inside(block):
