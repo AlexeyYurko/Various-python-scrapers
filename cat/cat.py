@@ -1,11 +1,12 @@
 # -*- coding: UTF-8 -*-
 
-#http://www.checkatrade.com
-
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
+"""
+http://www.checkatrade.com
+"""
 import sqlite3
 import time
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 
 trades = ['Air conditioning', 'Alarms/security', 'Appliance services/Repair', 'Asbestos services', 'Bathrooms', 'Bedrooms', 'Blacksmith/Ironwork', 'Builder', 'Carpenter', 'Carpets/Flooring', 'Central Heating Engineer', 'Chimney Sweep', 'Cleaning services', 'Curtains/Blinds/Shutters', 'Damp proofer', 'Drain/Sewer clearance', 'Driveways/Patios/Paths', 'Electrician', 'Fencing/Gates', 'Fireplaces/Stoves', 'Flood protection/defence', 'Furniture repair/Restoration', 'Garage/Vehicle services', 'Garage doors', 'Garden services', 'Glass', 'Hire services', 'Home improvements',
           'Hot tubs/spa', 'Household Water Treatment', 'Insulation', 'Kitchens', 'Landscaper', 'Locksmith', 'Lofts/Loft Ladders', 'Miscellaneous Services', 'Mobility', 'Motor homes', 'Painter/decorator', 'PAT testing', 'Pest/vermin control', 'Plasterer', 'Plumber', 'Removals/Storage', 'Renewable energy', 'Roofer', 'Rubbush/Waste/Clearance', 'Scaffolder', 'Shop fitting', 'Stonemason', 'Swimming pools', 'Taxi services', 'Telecommunications', 'Tiler - tiling', 'Towing/Transportation', 'Tree surgeon', 'TV aerial/Satellite services', 'Weather coatings', 'Windows/Doors/Conservatories']
