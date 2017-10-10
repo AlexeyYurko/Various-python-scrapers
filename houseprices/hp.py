@@ -2,13 +2,10 @@
 
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
-import urllib.request
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import sqlite3
 import time
-
-scontext = None
 
 conn = sqlite3.connect('hp.sqlite')
 cur = conn.cursor()
@@ -25,7 +22,7 @@ driver = webdriver.Firefox()
 
 for house in houses:
 
-    cur.execute("SELECT address FROM hp WHERE address= ?", (house[0], ))
+    cur.execute("SELECT address FROM hp WHERE address= ?", (house[0],))
 
     try:
         dattest = cur.fetchone()[0]
@@ -90,5 +87,5 @@ for house in houses:
 
     conn.commit()
 
-conn.close
+conn.close()
 print("\nDONE!!!")

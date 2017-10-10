@@ -2,12 +2,12 @@
 
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
-import urllib.request
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import sqlite3
 import time
 import re
+
 
 def has_inside(block):
     if len(block) > 0:
@@ -15,16 +15,15 @@ def has_inside(block):
     else:
         return '#N/A'
 
-scontext = None
 
 count = 0
 
 conn = sqlite3.connect('naea.sqlite')
 cur = conn.cursor()
 
-cur.execute('''
-CREATE TABLE IF NOT EXISTS estate (company_short TEXT, company TEXT, city TEXT, address TEXT, postcode TEXT, telephone TEXT, fax TEXT, email TEXT, www TEXT, empl1T TEXT, empl1FN TEXT,
-                                empl1LN TEXT, empl2T TEXT, empl2FN TEXT, empl2LN TEXT)''')
+cur.execute('''CREATE TABLE IF NOT EXISTS estate (company_short TEXT, company TEXT, city TEXT, address TEXT, 
+            postcode TEXT, telephone TEXT, fax TEXT, email TEXT, www TEXT, empl1T TEXT, empl1FN TEXT, empl1LN TEXT, 
+            empl2T TEXT, empl2FN TEXT, empl2LN TEXT)''')
 
 cur.execute('''SELECT * FROM ET WHERE nts=1 AND scraped=0''')
 towns = cur.fetchall()
@@ -107,13 +106,15 @@ for town in towns:
             empl2FN = ''
             empl2LN = ''
 
-        count+=1
-        print('[{}]'.format(count), company_long, address, postcode, phone, fax, email, www, empl1T, empl1FN, empl1LN, empl2T, empl2FN, empl2LN)
+        count += 1
+        print('[{}]'.format(count), company_long, address, postcode, phone, fax, email, www, empl1T, empl1FN, empl1LN,
+              empl2T, empl2FN, empl2LN)
 
-        cur.execute('''INSERT INTO estate (company_short, company, city, address, postcode, telephone, fax, email, www, empl1T, empl1FN,
-                                        empl1LN, empl2T, empl2FN, empl2LN)
-                        VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', (company, company_long, city, address, postcode, phone, fax, email, www, empl1T, empl1FN,
-                                                        empl1LN, empl2T, empl2FN, empl2LN))
+        cur.execute('''INSERT INTO estate (company_short, company, city, address, postcode, telephone, fax, email, www,
+                    empl1T, empl1FN, empl1LN, empl2T, empl2FN, empl2LN) 
+                    VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                    (company, company_long, city, address, postcode, phone, fax, email, www, empl1T, empl1FN,
+                     empl1LN, empl2T, empl2FN, empl2LN))
         conn.commit()
 
     cur.execute(

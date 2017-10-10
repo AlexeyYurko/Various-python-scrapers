@@ -26,7 +26,6 @@ def get_social(block):
     else:
         return '#N/A'
 
-scontext = None
 
 conn = sqlite3.connect('spa_data.sqlite')
 cur = conn.cursor()
@@ -39,7 +38,6 @@ urldetail = "http://www.spaweek.com"
 
 start_page = 1
 end_page = 70  # 70
-
 
 for page in range(start_page, end_page + 1):
 
@@ -57,7 +55,7 @@ for page in range(start_page, end_page + 1):
 
         cut = urldetail + link
 
-        cur.execute("SELECT name FROM spa WHERE url= ?", (cut, ))
+        cur.execute("SELECT name FROM spa WHERE url= ?", (cut,))
 
         try:
             dattest = cur.fetchone()[0]
@@ -85,7 +83,7 @@ for page in range(start_page, end_page + 1):
 
         facebook = get_social(soupDetail.find("li", {"class": "facebook"}))
         twitter = get_social(soupDetail.find("li", {"class": "twitter"}))
-        
+
         try:
             phone = has_inside(soupDetail.findAll(
                 "li", {"class": "phone"})).getText().strip()

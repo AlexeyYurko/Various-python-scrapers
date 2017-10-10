@@ -1,5 +1,3 @@
-# -*- coding: UTF-8 -*-
-
 """
 http://www.checkatrade.com
 """
@@ -8,18 +6,29 @@ import time
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
-trades = ['Air conditioning', 'Alarms/security', 'Appliance services/Repair', 'Asbestos services', 'Bathrooms', 'Bedrooms', 'Blacksmith/Ironwork', 'Builder', 'Carpenter', 'Carpets/Flooring', 'Central Heating Engineer', 'Chimney Sweep', 'Cleaning services', 'Curtains/Blinds/Shutters', 'Damp proofer', 'Drain/Sewer clearance', 'Driveways/Patios/Paths', 'Electrician', 'Fencing/Gates', 'Fireplaces/Stoves', 'Flood protection/defence', 'Furniture repair/Restoration', 'Garage/Vehicle services', 'Garage doors', 'Garden services', 'Glass', 'Hire services', 'Home improvements',
-          'Hot tubs/spa', 'Household Water Treatment', 'Insulation', 'Kitchens', 'Landscaper', 'Locksmith', 'Lofts/Loft Ladders', 'Miscellaneous Services', 'Mobility', 'Motor homes', 'Painter/decorator', 'PAT testing', 'Pest/vermin control', 'Plasterer', 'Plumber', 'Removals/Storage', 'Renewable energy', 'Roofer', 'Rubbush/Waste/Clearance', 'Scaffolder', 'Shop fitting', 'Stonemason', 'Swimming pools', 'Taxi services', 'Telecommunications', 'Tiler - tiling', 'Towing/Transportation', 'Tree surgeon', 'TV aerial/Satellite services', 'Weather coatings', 'Windows/Doors/Conservatories']
-
-scontext = None
+trades = ['Air conditioning', 'Alarms/security', 'Appliance services/Repair', 'Asbestos services',
+          'Bathrooms', 'Bedrooms', 'Blacksmith/Ironwork', 'Builder', 'Carpenter',
+          'Carpets/Flooring', 'Central Heating Engineer', 'Chimney Sweep', 'Cleaning services',
+          'Curtains/Blinds/Shutters', 'Damp proofer', 'Drain/Sewer clearance',
+          'Driveways/Patios/Paths', 'Electrician', 'Fencing/Gates', 'Fireplaces/Stoves',
+          'Flood protection/defence', 'Furniture repair/Restoration', 'Garage/Vehicle services',
+          'Garage doors', 'Garden services', 'Glass', 'Hire services', 'Home improvements',
+          'Hot tubs/spa', 'Household Water Treatment', 'Insulation', 'Kitchens',
+          'Landscaper', 'Locksmith', 'Lofts/Loft Ladders', 'Miscellaneous Services', 'Mobility',
+          'Motor homes', 'Painter/decorator', 'PAT testing', 'Pest/vermin control', 'Plasterer',
+          'Plumber', 'Removals/Storage', 'Renewable energy', 'Roofer', 'Rubbush/Waste/Clearance',
+          'Scaffolder', 'Shop fitting', 'Stonemason', 'Swimming pools', 'Taxi services',
+          'Telecommunications', 'Tiler - tiling', 'Towing/Transportation', 'Tree surgeon',
+          'TV aerial/Satellite services', 'Weather coatings', 'Windows/Doors/Conservatories']
 
 count = 0
 
 conn = sqlite3.connect('cat.sqlite')
 cur = conn.cursor()
 
-cur.executescript('''
-CREATE TABLE IF NOT EXISTS cat (company_name TEXT, url TEXT, person_name TEXT, email_address TEXT, landline_phone_number TEXT, mobile_phone_number TEXT, trade TEXT, town TEXT, region TEXT, postcode TEXT, www TEXT);''')
+cur.executescript('''CREATE TABLE IF NOT EXISTS cat (company_name TEXT, url TEXT, person_name TEXT,
+                  email_address TEXT, landline_phone_number TEXT, mobile_phone_number TEXT,
+                  trade TEXT, town TEXT, region TEXT, postcode TEXT, www TEXT);''')
 
 cur.execute('''SELECT * FROM tcml WHERE scanned=0''')
 towns = cur.fetchall()
@@ -59,7 +68,8 @@ for twn in towns:
                 print(company_name, url)
 
                 cur.execute(
-                    "SELECT company_name, url FROM cat WHERE company_name= ? AND url=?", (company_name, url))
+                    "SELECT company_name, url FROM cat WHERE company_name= ? AND url=?",
+                    (company_name, url))
                 try:
                     dattest = cur.fetchone()[0]
                     print('[{}] With town: {} found in database company: {} at link {}'.format(
@@ -84,7 +94,8 @@ for twn in towns:
                 postcode = ''
 
                 try:
-                    contacts = driver.find_element_by_class_name('contact-card')
+                    contacts = driver.find_element_by_class_name(
+                        'contact-card')
                 except:
                     pass
 
@@ -125,31 +136,42 @@ for twn in towns:
                     pass
 
                 try:
-                    address = driver.find_elements_by_xpath("//span[@itemprop='addressLocality']")
+                    address = driver.find_elements_by_xpath(
+                        "//span[@itemprop='addressLocality']")
                     town = ', '.join(list(adr.text for adr in address))
                 except:
                     pass
 
                 try:
-                    region = driver.find_element_by_xpath("//span[@itemprop='addressRegion']").text
+                    region = driver.find_element_by_xpath(
+                        "//span[@itemprop='addressRegion']").text
                 except:
                     pass
 
                 body = driver.find_element_by_tag_name("body")
                 body.send_keys(Keys.COMMAND + 'w')
-                driver.switch_to_window(curWindowHndl)
+                driver.switch_to.window(curWindowHndl)
 
                 count += 1
-                print('[{}] Company {} of {}, with email {}, landline {}, mobile {}, trade {}, town {}, region {}, postcode {}'.format(
-                    count, company_name, person_name, email_address, landline_phone_number, mobile_phone_number, trade, town, region, postcode))
+                print('''[{}] Company {} of {}, with email {}, landline {}, mobile {}, trade {},
+                      town {}, region {}, postcode {}'''.format(count, company_name, person_name,
+                                                                email_address,
+                                                                landline_phone_number,
+                                                                mobile_phone_number, trade, town,
+                                                                region, postcode))
 
-                cur.execute('''INSERT INTO cat (company_name, url, person_name, email_address, landline_phone_number, mobile_phone_number, trade, town, region, postcode, www )
-                                VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', (company_name, url, person_name, email_address, landline_phone_number, mobile_phone_number, trade, town, region, postcode, www))
+                cur.execute('''INSERT INTO cat (company_name, url, person_name, email_address,
+                            landline_phone_number, mobile_phone_number, trade, town, region,
+                            postcode, www )
+                            VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                            (company_name, url, person_name, email_address, landline_phone_number,
+                             mobile_phone_number, trade, town, region, postcode, www))
                 conn.commit()
 
             print('Moving to next page')
             try:
-                next_element = driver.find_elements_by_class_name('pagination__prev-next')
+                next_element = driver.find_elements_by_class_name(
+                    'pagination__prev-next')
                 if 'Next' in next_element[-1].text:
                     next_element[-1].click()
                     time.sleep(1)

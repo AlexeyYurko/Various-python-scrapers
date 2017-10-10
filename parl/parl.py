@@ -27,12 +27,12 @@ def check_mail(eml):
 
 
 data = open('parl.csv', 'w')
-data.write("Name, e-mail\n")
+data.write('Name, e-mail\n')
 
 driver = webdriver.Firefox()
 
 
-url = ("http://www.parliament.uk/mps-lords-and-offices/mps/")
+url = 'http://www.parliament.uk/mps-lords-and-offices/mps/'
 page = urlopen(url)
 soup = BeautifulSoup(page, 'html.parser')
 table = soup.findAll('tr')

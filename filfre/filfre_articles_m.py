@@ -14,7 +14,7 @@ collection = db['articles']
 
 image_count = 0
 
-url = ("http://www.filfre.net/sitemap/")
+url = 'http://www.filfre.net/sitemap/'
 page = urlopen(url)
 articles = BeautifulSoup(page, 'lxml').find(
     'div', {'id': 'wp-realtime-sitemap-posts'})
@@ -44,14 +44,12 @@ for link in links:
                 image_count += 1
                 with open(image_name, 'wb') as handler:
                     handler.write(image_data)
-                images_links.append({'image_name_local': image_name,
-                                     'image_url': inside_url,
-                                     'image_text': inside_article_url.text
-                                    })
+                images_links.append(
+                    {'image_name_local': image_name, 'image_url': inside_url,
+                     'image_text': inside_article_url.text})
             else:
                 article_links.append({'inside_url': inside_url,
-                                      'inside_text': inside_article_url.text
-                                     })
+                                      'inside_text': inside_article_url.text})
         post = {
             'article': article,
             'url': article_url,

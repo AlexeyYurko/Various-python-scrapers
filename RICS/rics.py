@@ -25,9 +25,9 @@ def type_of_surveyor(data):
     for type_entry in types_list:
         type_name = type_entry.lstrip().rstrip()
         cur.execute('''INSERT OR IGNORE INTO tos (name)
-            VALUES ( ? )''', ( type_name, ) )
+            VALUES ( ? )''', (type_name,))
         cur.execute(
-            'SELECT id FROM tos WHERE name = ? ', (type_name, ))
+            'SELECT id FROM tos WHERE name = ? ', (type_name,))
         type_id = cur.fetchone()[0]
         type_list.append(type_id)
     conn.commit()
@@ -39,13 +39,14 @@ def list_of_services(data):
     for service_entry in data:
         service_name = service_entry.getText()
         cur.execute('''INSERT OR IGNORE INTO services (name)
-            VALUES ( ? )''', ( service_name, ) )
+            VALUES ( ? )''', (service_name,))
         cur.execute(
-            'SELECT id FROM services WHERE name = ? ', (service_name, ))
+            'SELECT id FROM services WHERE name = ? ', (service_name,))
         service_id = cur.fetchone()[0]
         service_list.append(service_id)
     conn.commit()
     return ', '.join(map(str, service_list))
+
 
 def get_detail_data(url_detail):
     time.sleep(2)
@@ -86,7 +87,6 @@ def get_detail_data(url_detail):
     contact1, contact2, contact3, contact4, contact5 = mng_list[:5]
     return mobile, fax, services, buss_type, type_of_srv, contact1, contact2, contact3, contact4, contact5
 
-scontext = None
 
 count = 0
 
@@ -137,7 +137,8 @@ for town in towns:
             address = ', '.join(address_long[:-1])
 
             cur.execute(
-                "SELECT company, address FROM surveyor WHERE company= ? AND address=? AND postcode=?", (company, address, postcode))
+                "SELECT company, address FROM surveyor WHERE company= ? AND address=? AND postcode=?",
+                (company, address, postcode))
             try:
                 dattest = cur.fetchone()[0]
                 print('[{}] With town: {} found in database company: {} at {}'.format(
@@ -164,24 +165,28 @@ for town in towns:
             try:
                 url_detail = i.find_elements_by_css_selector(
                     'a')[0].get_attribute('href')
-                mobile, fax, services, buss_type, type_of_srv, contact1, contact2, contact3, contact4, contact5 = get_detail_data(url_detail)
+                mobile, fax, services, buss_type, type_of_srv, contact1, contact2, contact3, contact4, contact5 = get_detail_data(
+                    url_detail)
             except:
                 mobile, fax, services, buss_type, type_of_srv, contact1, contact2, contact3, contact4, contact5 = '', '', '', '', '', '', '', '', '', '',
 
             count += 1
-            print('[{}] Company {} at {}, {} with phone {}, mobile {}, fax {}, email {}, web {},\ntypes of service {}, business type {} and services {},\nwith contacts: {}, {}, {}, {}, {}'.format(
-                count, company, address, postcode, telephone, mobile, fax, email, www, type_of_srv, buss_type, services, contact1, contact2, contact3, contact4, contact5))
+            print(
+                '[{}] Company {} at {}, {} with phone {}, mobile {}, fax {}, email {}, web {},\ntypes of service {}, business type {} and services {},\nwith contacts: {}, {}, {}, {}, {}'.format(
+                    count, company, address, postcode, telephone, mobile, fax, email, www, type_of_srv, buss_type,
+                    services, contact1, contact2, contact3, contact4, contact5))
 
             cur.execute('''INSERT INTO surveyor (company, address, postcode, telephone, mobile, fax, email, www,
                                             type_of_srv, buss_type, services,
                                             contact1, contact2, contact3, contact4, contact5 )
-                            VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', (company, address, postcode, telephone, mobile, fax, email, www,
-                                                                                          type_of_srv, buss_type, services,
-                                                                                          contact1, contact2, contact3, contact4, contact5))
+                            VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                        (company, address, postcode, telephone, mobile, fax, email, www,
+                         type_of_srv, buss_type, services,
+                         contact1, contact2, contact3, contact4, contact5))
             conn.commit()
 
         end_of_town = driver.find_elements_by_xpath("//a[@class='next disabled']")
-        if len(end_of_town)>0:
+        if len(end_of_town) > 0:
             break
         else:
             print('Moving to next page')
