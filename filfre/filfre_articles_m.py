@@ -41,6 +41,13 @@ for link in links:
                 image_name = 'img/{}_{}'.format(
                     str(image_count).zfill(4),
                     inside_url.split('/')[-1])
+
+                # check for link to page, not the image itself
+                if image_name.endswith('_'):
+                    page = urlopen(inside_url)
+                    image_url = BeautifulSoup(page, 'lxml').find('p', {'class': 'attachment'}).find('img')['src']
+                    image_name = image_name + image_url.split('/')[-1]
+                    image_data = requests.get(image_url).content
                 image_count += 1
                 with open(image_name, 'wb') as handler:
                     handler.write(image_data)
