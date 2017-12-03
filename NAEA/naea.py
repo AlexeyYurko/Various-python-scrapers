@@ -1,19 +1,16 @@
 # -*- coding: UTF-8 -*-
 
-from bs4 import BeautifulSoup
 from urllib.request import urlopen
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 import sqlite3
 import time
 import re
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 
 
 def has_inside(block):
-    if len(block) > 0:
-        return block[0].strip()
-    else:
-        return '#N/A'
+    return block[0].strip() if block else '#N/A'
 
 
 count = 0
@@ -21,9 +18,9 @@ count = 0
 conn = sqlite3.connect('naea.sqlite')
 cur = conn.cursor()
 
-cur.execute('''CREATE TABLE IF NOT EXISTS estate (company_short TEXT, company TEXT, city TEXT, address TEXT, 
-            postcode TEXT, telephone TEXT, fax TEXT, email TEXT, www TEXT, empl1T TEXT, empl1FN TEXT, empl1LN TEXT, 
-            empl2T TEXT, empl2FN TEXT, empl2LN TEXT)''')
+cur.execute('''CREATE TABLE IF NOT EXISTS estate (company_short TEXT, company TEXT, city TEXT,
+            address TEXT, postcode TEXT, telephone TEXT, fax TEXT, email TEXT, www TEXT,
+            empl1T TEXT, empl1FN TEXT, empl1LN TEXT, empl2T TEXT, empl2FN TEXT, empl2LN TEXT)''')
 
 cur.execute('''SELECT * FROM ET WHERE nts=1 AND scraped=0''')
 towns = cur.fetchall()
@@ -58,7 +55,8 @@ for town in towns:
         city = info[1]
 
         cur.execute(
-            "SELECT company_short, city FROM estate WHERE company_short= ? AND city= ?", (company, city))
+            "SELECT company_short, city FROM estate WHERE company_short= ? AND city= ?",
+            (company, city))
         try:
             dattest = cur.fetchone()[0]
             print('[{}] With town: {} found in database company: {} at city: {}'.format(
@@ -80,10 +78,10 @@ for town in towns:
 
         contacts_group = soup.find("div", {"id": "contact_points_container"})
         cg = contacts_group.getText().strip()
-        phone = has_inside(re.findall('Telephone:[\s]+([\d]+.[\d]+.[\d]+)', cg))
-        fax = has_inside(re.findall('Fax:[\s]+([\d]+.[\d]+.[\d]+)', cg))
-        email = has_inside(re.findall('([\S]+@[\S]+)', cg))
-        www = has_inside(re.findall('Website:[\s]+(www.+)', cg))
+        phone = has_inside(re.findall(r'Telephone:[\s]+([\d]+.[\d]+.[\d]+)', cg))
+        fax = has_inside(re.findall(r'Fax:[\s]+([\d]+.[\d]+.[\d]+)', cg))
+        email = has_inside(re.findall(r'([\S]+@[\S]+)', cg))
+        www = has_inside(re.findall(r'Website:[\s]+(www.+)', cg))
 
         employees_group = soup.findAll("div", {"id": "display_list_container"})
         employees = employees_group[1].findAll(href=True)
