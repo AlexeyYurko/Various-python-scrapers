@@ -2,20 +2,28 @@
 grab list of articles, articles itself and images from filfre.net
 using MongoDB
 """
-
+import pickle
+import os
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import requests
 from pymongo import MongoClient
 
-client = MongoClient()
-db = client['filfre']
-collection = db['articles']
+CLIENT = MongoClient()
+DB = CLIENT['filfre']
+collection = DB['articles']
 
-image_count = 0
+if not os.path.exists('img'):
+    os.makedirs('img')
 
-url = 'http://www.filfre.net/sitemap/'
-page = urlopen(url)
+try:
+    pickle_in = open("image_count.pickle", "rb")
+    image_count = pickle.load(pickle_in)
+except FileNotFoundError:
+    image_count = 0
+
+URL = 'http://www.filfre.net/sitemap/'
+page = urlopen(URL)
 articles = BeautifulSoup(page, 'lxml').find(
     'div', {'id': 'wp-realtime-sitemap-posts'})
 links = articles.findAll('a')
@@ -45,7 +53,8 @@ for link in links:
                 # check for link to page, not the image itself
                 if image_name.endswith('_'):
                     page = urlopen(inside_url)
-                    image_url = BeautifulSoup(page, 'lxml').find('p', {'class': 'attachment'}).find('img')['src']
+                    image_url = BeautifulSoup(page, 'lxml').find(
+                        'p', {'class': 'attachment'}).find('img')['src']
                     image_name = image_name + image_url.split('/')[-1]
                     image_data = requests.get(image_url).content
                 image_count += 1
@@ -65,3 +74,6 @@ for link in links:
             'images': images_links
         }
         collection.save(post)
+        pickle_out = open("image_count.pickle", "wb")
+        pickle.dump(image_count, pickle_out)
+        pickle_out.close()
