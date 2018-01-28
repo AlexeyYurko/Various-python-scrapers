@@ -1,2 +1,4 @@
 filfre/img/
 filfre/image_count.pickle
+.DS_Store
+.gitignore
