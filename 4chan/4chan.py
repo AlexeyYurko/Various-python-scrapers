@@ -33,7 +33,7 @@ def download_image(url):
 
 def parse_boards(board):
     urls = []
-    for page in range(1, 2):
+    for page in range(1, 11):
         page_number = '/' + str(page) if page > 1 else ''
         url = (BASE_URL + board + page_number)
         print('Extracting images URL from %s' % url)
