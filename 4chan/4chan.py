@@ -45,9 +45,7 @@ def get_page(url):
 
 
 def get_links(page):
-    '''
-    get links from page, only from 4cdn.org
-    '''
+    """get links from page, only from 4cdn.org"""
     page_urls = []
     links = page.find_all('a', target="_blank", href=True)
     for link in links:
