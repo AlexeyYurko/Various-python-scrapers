@@ -1,7 +1,7 @@
 # Python script extracting images from 4chan boards
 
 ### Usage:
-python3 4chan.py board
+4chan.py board_name
 
 ### to do:
 - multiple boards;

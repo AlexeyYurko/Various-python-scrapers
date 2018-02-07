@@ -1,3 +1,8 @@
+"""
+download images from 4chan boards
+usage: 4chan.py board_name
+"""
+
 import sys
 import os
 import multiprocessing
@@ -9,6 +14,7 @@ BASE_URL = 'https://boards.4chan.org/'
 
 
 def download_image(url):
+    """download image with check for existing file"""
     out_dir = sys.argv[1]
     filename = os.path.join(out_dir, os.path.basename(url))
 
@@ -32,12 +38,16 @@ def download_image(url):
 
 
 def get_page(url):
+    """get page from url with requests and fake user agent"""
     response = requests.get(
         url, headers={'User-Agent': UserAgent().chrome}).content
     return BeautifulSoup(response, 'lxml')
 
 
 def get_links(page):
+    '''
+    get links from page, only from 4cdn.org
+    '''
     page_urls = []
     links = page.find_all('a', target="_blank", href=True)
     for link in links:
@@ -48,6 +58,7 @@ def get_links(page):
 
 
 def parse_boards(board):
+    """parse desired board, pages from 1 to 10"""
     urls = []
     for page in range(1, 11):
         page_number = '/' + str(page) if page > 1 else ''
@@ -70,6 +81,7 @@ def parse_boards(board):
 
 
 def Run():
+    """main functinon"""
     if len(sys.argv) != 2:
         print('Syntax: %s <board>' % sys.argv[0])
         sys.exit(0)

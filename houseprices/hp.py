@@ -1,11 +1,15 @@
+"""
+get selling price of houses from http://www.zoopla.co.uk
+
+"""
 # -*- coding: UTF-8 -*-
 
-from bs4 import BeautifulSoup
-from urllib.request import urlopen
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 import sqlite3
 import time
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from urllib.request import urlopen
+from bs4 import BeautifulSoup
 
 conn = sqlite3.connect('hp.sqlite')
 cur = conn.cursor()
@@ -68,7 +72,8 @@ for house in houses:
 
         try:
             prc = soup.find("strong", {"class": "buyers"}).getText().strip()
-            price = ' '.join(prc[1:].replace(',', '').split()) if '£' in prc else ' '.join(prc.replace(',', '').split())
+            price = ' '.join(prc[1:].replace(',', '').split()) if '£' in prc else ' '.join(
+                prc.replace(',', '').split())
         except:
             price = '-000'
 
