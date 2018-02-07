@@ -31,20 +31,30 @@ def download_image(url):
         return
 
 
+def get_page(url):
+    response = requests.get(
+        url, headers={'User-Agent': UserAgent().chrome}).content
+    return BeautifulSoup(response, 'lxml')
+
+
+def get_links(page):
+    page_urls = []
+    links = page.find_all('a', target="_blank", href=True)
+    for link in links:
+        address = link['href'][2:]
+        if address.startswith('i.4cdn.org'):
+            page_urls.append('http://%s' % address)
+    return page_urls
+
+
 def parse_boards(board):
     urls = []
     for page in range(1, 11):
         page_number = '/' + str(page) if page > 1 else ''
         url = (BASE_URL + board + page_number)
         print('Extracting images URL from %s' % url)
-        response = requests.get(
-            url, headers={'User-Agent': UserAgent().chrome}).content
-        soup = BeautifulSoup(response, 'lxml')
-        links = soup.find_all('a', target="_blank", href=True)
-        for link in links:
-            address = link['href'][2:]
-            if address.startswith('i.4cdn.org'):
-                urls.append('http://%s' % address)
+        soup = get_page(url)
+        urls += get_links(soup)
 
         # going through threads
         threads = soup.find_all('a', string='View Thread')
@@ -52,15 +62,11 @@ def parse_boards(board):
             for thread in threads:
                 thread_url = (BASE_URL + board + page_number +
                               '/' + thread['href'])
-                response = requests.get(
-                    thread_url, headers={'User-Agent': UserAgent().chrome}).content
-                soup = BeautifulSoup(response, 'lxml')
-                links = soup.find_all('a', target="_blank", href=True)
-                for link in links:
-                    address = link['href'][2:]
-                    if address.startswith('i.4cdn.org'):
-                        urls.append('http://%s' % address)
-    return set(urls)
+                soup = get_page(thread_url)
+                urls += get_links(soup)
+    urls = set(urls)
+    print('Board /{}. Found {} files.'.format(board, len(urls)))
+    return urls
 
 
 def Run():
@@ -74,7 +80,7 @@ def Run():
         os.mkdir(board)
 
     images_list = parse_boards(board)
-    pool = multiprocessing.Pool(processes=50)
+    pool = multiprocessing.Pool(processes=30)
     pool.map(download_image, images_list)
 
 
