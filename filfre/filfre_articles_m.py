@@ -10,10 +10,12 @@ from bs4 import BeautifulSoup
 import requests
 from pymongo import MongoClient
 
-def get_articles(folder):
+CLIENT = MongoClient()
+DB = CLIENT['filfre']
+URL = 'http://www.filfre.net/sitemap/'
 
-    CLIENT = MongoClient()
-    DB = CLIENT['filfre']
+
+def get_articles(folder):
     collection = DB['articles']
 
     try:
@@ -22,7 +24,6 @@ def get_articles(folder):
     except FileNotFoundError:
         image_count = 0
 
-    URL = 'http://www.filfre.net/sitemap/'
     page = urlopen(URL)
     articles = BeautifulSoup(page, 'lxml').find(
         'div', {'id': 'wp-realtime-sitemap-posts'})
@@ -47,8 +48,8 @@ def get_articles(folder):
                 if images:
                     image_data = requests.get(inside_url).content
                     image_name = '{}/{}_{}'.format(folder,
-                        str(image_count).zfill(4),
-                        inside_url.split('/')[-1])
+                                                   str(image_count).zfill(4),
+                                                   inside_url.split('/')[-1])
 
                     # check for link to page, not the image itself
                     if image_name.endswith('_'):
@@ -62,10 +63,10 @@ def get_articles(folder):
                         handler.write(image_data)
                     images_links.append(
                         {'image_name_local': image_name, 'image_url': inside_url,
-                        'image_text': inside_article_url.text})
+                         'image_text': inside_article_url.text})
                 else:
                     article_links.append({'inside_url': inside_url,
-                                        'inside_text': inside_article_url.text})
+                                          'inside_text': inside_article_url.text})
             post = {
                 'article': article,
                 'url': article_url,
@@ -79,7 +80,8 @@ def get_articles(folder):
             pickle_out.close()
     return
 
-def Run():
+
+def run():
     """main functinon"""
     if len(sys.argv) != 2:
         print('Syntax: %s <folder>' % sys.argv[0])
@@ -92,5 +94,6 @@ def Run():
 
     get_articles(to_folder)
 
+
 if __name__ == '__main__':
-    Run()
+    run()
