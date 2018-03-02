@@ -41,7 +41,7 @@ end_page = 70  # 70
 
 for page in range(start_page, end_page + 1):
 
-    print('Getting data for ' + str(page) + ' page')
+    print('Getting data for {} page'.format(page))
     url = (urlbase + str(page))
     page_adv = urlopen(url)
     soup = BeautifulSoup(page_adv, 'html.parser')
