@@ -1,6 +1,8 @@
 """
 grab list of articles, articles itself and images from filfre.net
 using MongoDB
+
+TODO: rewrite code to more readable
 """
 import pickle
 import os
@@ -42,31 +44,67 @@ def get_articles(folder):
             inside_article_urls = article_raw.findAll('a')
             article_links = []
             images_links = []
-            for inside_article_url in inside_article_urls:
-                inside_url = inside_article_url.get('href')
-                images = inside_article_url.find('img')
-                if images:
-                    image_data = requests.get(inside_url).content
-                    image_name = '{}/{}_{}'.format(folder,
-                                                   str(image_count).zfill(4),
-                                                   inside_url.split('/')[-1])
+            passed_url = []
 
-                    # check for link to page, not the image itself
-                    if image_name.endswith('_'):
-                        page = urlopen(inside_url)
-                        image_url = BeautifulSoup(page, 'lxml').find(
-                            'p', {'class': 'attachment'}).find('img')['src']
-                        image_name = image_name + image_url.split('/')[-1]
+            # search for images
+            article_images = article_raw.findAll(
+                'div', {'class': 'wp-caption aligncenter'})
+            for image in article_images:
+                image_url = image.find('a').get('href')
+                try:
+                    image_text = image.find(
+                        'p', {'class': 'wp-caption-text'}).text
+                except:
+                    image_text = ''
+                image_name = '{}/{}_{}'.format(folder,
+                                               str(image_count).zfill(4),
+                                               image_url.split('/')[-1])
+                # check for link to page, not the image itself
+                if image_name.endswith('_'):
+                    page = urlopen(image_url)
+                    image_url = BeautifulSoup(page, 'lxml').find(
+                        'p', {'class': 'attachment'}).find('img')['src']
+                    image_name = image_name + image_url.split('/')[-1]
+                image_data = requests.get(image_url).content
+                image_count += 1
+                print('\tSaving image "{}" with caption "{}"'.format(
+                    image_url, image_text[:40] + '...' if len(image_text) > 40 else image_text))
+                with open(image_name, 'wb') as handler:
+                    handler.write(image_data)
+                images_links.append(
+                    {'image_name_local': image_name, 'image_url': image_url,
+                     'image_text': image_text})
+                passed_url.append(image_url)
+
+            # search for links
+            for inside_url in inside_article_urls:
+                # and for images when images not in div block
+                image = inside_url.find('img')
+                if image:
+                    image_url = inside_url.get('href')
+                    if image_url in passed_url:
+                        break
+                    else:
+                        image_name = '{}/{}_{}'.format(folder,
+                                                       str(image_count).zfill(
+                                                           4),
+                                                       image_url.split('/')[-1])
+                        if image_name.endswith('_'):
+                            print(image_name)
+                            break
                         image_data = requests.get(image_url).content
-                    image_count += 1
-                    with open(image_name, 'wb') as handler:
-                        handler.write(image_data)
-                    images_links.append(
-                        {'image_name_local': image_name, 'image_url': inside_url,
-                         'image_text': inside_article_url.text})
+                        image_text = inside_url.find('img').get('title')
+                        if not image_text:
+                            image_text = inside_url.find('img').get('alt')
+                        image_count += 1
+                        print('\tSaving image "{}" with caption "{}"'.format(
+                            image_url, image_text[:40] + '...' if len(image_text) > 40 else image_text))
+                        with open(image_name, 'wb') as handler:
+                            handler.write(image_data)
                 else:
-                    article_links.append({'inside_url': inside_url,
-                                          'inside_text': inside_article_url.text})
+                    article_links.append({'inside_url': image_url,
+                                          'inside_text': inside_url.text})
+
             post = {
                 'article': article,
                 'url': article_url,
@@ -78,6 +116,7 @@ def get_articles(folder):
             pickle_out = open("image_count.pickle", "wb")
             pickle.dump(image_count, pickle_out)
             pickle_out.close()
+            print()
     return
 
 
