@@ -118,7 +118,6 @@ def get_articles(folder):
                 'links': article_links,
                 'images': images_links
             }
-            exit()
 
             collection.save(post)
             pickle_out = open("image_count.pickle", "wb")
