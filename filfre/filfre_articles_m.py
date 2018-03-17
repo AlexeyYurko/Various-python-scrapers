@@ -76,7 +76,7 @@ def get_articles(folder):
                         'p', {'class': 'wp-caption-text'}).text
                 except:
                     image_text = ''
-
+                passed.append(image_url)
                 # check for link to page, not the image itself
                 image_name, image_url = check_for_page(
                     folder, image_count, image_url)
@@ -86,7 +86,6 @@ def get_articles(folder):
                 images_links.append(
                     {'image_name_local': image_name, 'image_url': image_url,
                      'image_text': image_text})
-                passed.append(image_url)
 
             # search for links
             for inside_url in inside_article_urls:
@@ -97,10 +96,10 @@ def get_articles(folder):
                     if not image_text:
                         image_text = inside_url.find('img').get('alt')
                     image_url = inside_url.get('href')
-                    image_name, image_url = check_for_page(
-                        folder, image_count, image_url)
                     if image_url in passed:
                         break
+                    image_name, image_url = check_for_page(
+                        folder, image_count, image_url)
 
                     image_count += 1
                     image_load(image_url, image_name, image_text)
