@@ -20,7 +20,7 @@ URL = 'http://www.filfre.net/sitemap/'
 def image_load(image_url, image_name, image_text):
     image_data = requests.get(image_url).content
     print('\tSaving image:\n\t{},\n\tas {}\n\twith caption "{}"'.format(
-        image_url, image_name, image_text[:40] + '...' if len(image_text) > 40 else image_text))
+        image_url, image_name, image_text))
     with open(image_name, 'wb') as handler:
         handler.write(image_data)
     return
