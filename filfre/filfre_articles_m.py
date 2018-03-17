@@ -17,6 +17,15 @@ DB = CLIENT['filfre']
 URL = 'http://www.filfre.net/sitemap/'
 
 
+def image_load(image_url, image_name, image_text):
+    image_data = requests.get(image_url).content
+    print('\tSaving image:\n\t{},\n\tas {}\n\twith caption "{}"'.format(
+        image_url, image_name, image_text[:40] + '...' if len(image_text) > 40 else image_text))
+    with open(image_name, 'wb') as handler:
+        handler.write(image_data)
+    return
+
+
 def get_articles(folder):
     collection = DB['articles']
 
@@ -37,7 +46,6 @@ def get_articles(folder):
             article_url = link.get('href')
             print('Article "{}", link {}'.format(article, article_url))
             article_page = urlopen(article_url)
-            print('Loaded article "{}"'.format(article))
             article_raw = BeautifulSoup(article_page, 'lxml').find(
                 'div', {'class': 'entry'})
             article_text = article_raw.text.strip()
@@ -57,7 +65,7 @@ def get_articles(folder):
                 except:
                     image_text = ''
                 image_name = '{}/{}_{}'.format(folder,
-                                               str(image_count).zfill(4),
+                                               str(image_count).zfill(5),
                                                image_url.split('/')[-1])
                 # check for link to page, not the image itself
                 if image_name.endswith('_'):
@@ -65,12 +73,9 @@ def get_articles(folder):
                     image_url = BeautifulSoup(page, 'lxml').find(
                         'p', {'class': 'attachment'}).find('img')['src']
                     image_name = image_name + image_url.split('/')[-1]
-                image_data = requests.get(image_url).content
                 image_count += 1
-                print('\tSaving image "{}" with caption "{}"'.format(
-                    image_url, image_text[:40] + '...' if len(image_text) > 40 else image_text))
-                with open(image_name, 'wb') as handler:
-                    handler.write(image_data)
+                image_load(image_url, image_name, image_text)
+
                 images_links.append(
                     {'image_name_local': image_name, 'image_url': image_url,
                      'image_text': image_text})
@@ -87,24 +92,22 @@ def get_articles(folder):
                     else:
                         image_name = '{}/{}_{}'.format(folder,
                                                        str(image_count).zfill(
-                                                           4),
+                                                           5),
                                                        image_url.split('/')[-1])
                         if image_name.endswith('_'):
                             print(image_name)
                             break
-                        image_data = requests.get(image_url).content
                         image_text = inside_url.find('img').get('title')
                         if not image_text:
                             image_text = inside_url.find('img').get('alt')
                         image_count += 1
-                        print('\tSaving image "{}" with caption "{}"'.format(
-                            image_url, image_text[:40] + '...' if len(image_text) > 40 else image_text))
-                        with open(image_name, 'wb') as handler:
-                            handler.write(image_data)
+                        image_load(image_url, image_name, image_text)
+                        images_links.append(
+                            {'image_name_local': image_name, 'image_url': image_url,
+                             'image_text': image_text})
                 else:
                     article_links.append({'inside_url': image_url,
                                           'inside_text': inside_url.text})
-
             post = {
                 'article': article,
                 'url': article_url,
@@ -116,7 +119,7 @@ def get_articles(folder):
             pickle_out = open("image_count.pickle", "wb")
             pickle.dump(image_count, pickle_out)
             pickle_out.close()
-            print()
+            print('Loaded and saved article "{}"\n'.format(article))
     return
 
 
