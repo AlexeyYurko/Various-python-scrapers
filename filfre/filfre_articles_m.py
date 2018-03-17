@@ -26,6 +26,18 @@ def image_load(image_url, image_name, image_text):
     return
 
 
+def check_for_page(folder, counter, image_url):
+    image_name = '{}/{}_{}'.format(folder,
+                                   str(counter).zfill(5),
+                                   image_url.split('/')[-1])
+    if image_name.endswith('_'):
+        page = urlopen(image_url)
+        image_url = BeautifulSoup(page, 'lxml').find(
+            'p', {'class': 'attachment'}).find('img')['src']
+        image_name = image_name + image_url.split('/')[-1]
+    return image_name, image_url
+
+
 def get_articles(folder):
     collection = DB['articles']
 
@@ -52,7 +64,7 @@ def get_articles(folder):
             inside_article_urls = article_raw.findAll('a')
             article_links = []
             images_links = []
-            passed_url = []
+            passed = []
 
             # search for images
             article_images = article_raw.findAll(
@@ -64,50 +76,41 @@ def get_articles(folder):
                         'p', {'class': 'wp-caption-text'}).text
                 except:
                     image_text = ''
-                image_name = '{}/{}_{}'.format(folder,
-                                               str(image_count).zfill(5),
-                                               image_url.split('/')[-1])
+
                 # check for link to page, not the image itself
-                if image_name.endswith('_'):
-                    page = urlopen(image_url)
-                    image_url = BeautifulSoup(page, 'lxml').find(
-                        'p', {'class': 'attachment'}).find('img')['src']
-                    image_name = image_name + image_url.split('/')[-1]
+                image_name, image_url = check_for_page(
+                    folder, image_count, image_url)
                 image_count += 1
                 image_load(image_url, image_name, image_text)
 
                 images_links.append(
                     {'image_name_local': image_name, 'image_url': image_url,
                      'image_text': image_text})
-                passed_url.append(image_url)
+                passed.append(image_url)
 
             # search for links
             for inside_url in inside_article_urls:
                 # and for images when images not in div block
                 image = inside_url.find('img')
                 if image:
+                    image_text = inside_url.find('img').get('title')
+                    if not image_text:
+                        image_text = inside_url.find('img').get('alt')
                     image_url = inside_url.get('href')
-                    if image_url in passed_url:
+                    image_name, image_url = check_for_page(
+                        folder, image_count, image_url)
+                    if image_url in passed:
                         break
-                    else:
-                        image_name = '{}/{}_{}'.format(folder,
-                                                       str(image_count).zfill(
-                                                           5),
-                                                       image_url.split('/')[-1])
-                        if image_name.endswith('_'):
-                            print(image_name)
-                            break
-                        image_text = inside_url.find('img').get('title')
-                        if not image_text:
-                            image_text = inside_url.find('img').get('alt')
-                        image_count += 1
-                        image_load(image_url, image_name, image_text)
-                        images_links.append(
-                            {'image_name_local': image_name, 'image_url': image_url,
-                             'image_text': image_text})
+
+                    image_count += 1
+                    image_load(image_url, image_name, image_text)
+                    images_links.append(
+                        {'image_name_local': image_name, 'image_url': image_url,
+                            'image_text': image_text})
                 else:
-                    article_links.append({'inside_url': image_url,
+                    article_links.append({'inside_url': inside_url.get('href'),
                                           'inside_text': inside_url.text})
+
             post = {
                 'article': article,
                 'url': article_url,
@@ -115,6 +118,8 @@ def get_articles(folder):
                 'links': article_links,
                 'images': images_links
             }
+            exit()
+
             collection.save(post)
             pickle_out = open("image_count.pickle", "wb")
             pickle.dump(image_count, pickle_out)
