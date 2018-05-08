@@ -57,8 +57,8 @@ def get_detail_data(url_detail):
         "div", {"class": "detail_intro"}).__str__()
 
     mobile = has_inside(re.findall(
-        'Mobile.+"([0-9\s]+)"', company_info))
-    fax = has_inside(re.findall('Fax.+"([0-9\s]+)"', company_info))
+        r'Mobile.+"([0-9\s]+)"', company_info))
+    fax = has_inside(re.findall(r'Fax.+"([0-9\s]+)"', company_info))
 
     services = list_of_services(soup.findAll(
         "a", {"class": "servicesglossary"}))
@@ -67,11 +67,11 @@ def get_detail_data(url_detail):
     tos = soup.findAll("div", {"class": "rCol"})[
         0].__str__().replace('\n', '')
     buss_type = has_inside(re.findall(
-        '<h4>Business type<\/h4><p>(.+?)<', tos))
+        r'<h4>Business type<\/h4><p>(.+?)<', tos))
 
     tos = soup.__str__().replace('\n', '')
     type_of_srv = type_of_surveyor(has_inside(
-        re.findall('<h4>Type of surveyor<\/h4><p>(.+?)<', tos)))
+        re.findall(r'<h4>Type of surveyor<\/h4><p>(.+?)<', tos)))
 
     # managers
     tos = soup.findAll("p")
@@ -155,9 +155,10 @@ for town in towns:
 
             try:
                 inner_html = basic_info[1].get_attribute('innerHTML')
-                email = has_inside(re.findall(':([\S]+@[\S]+)[?]', inner_html))
+                email = has_inside(re.findall(
+                    r':([\S]+@[\S]+)[?]', inner_html))
                 telephone = has_inside(re.findall(
-                    '<span>([\S\s]+)<\/span>', inner_html))
+                    r'<span>([\S\s]+)<\/span>', inner_html))
             except:
                 email = ''
                 telephone = ''
@@ -185,13 +186,15 @@ for town in towns:
                          contact1, contact2, contact3, contact4, contact5))
             conn.commit()
 
-        end_of_town = driver.find_elements_by_xpath("//a[@class='next disabled']")
+        end_of_town = driver.find_elements_by_xpath(
+            "//a[@class='next disabled']")
         if len(end_of_town) > 0:
             break
         else:
             print('Moving to next page')
             try:
-                next_element = driver.find_element_by_class_name('next').click()
+                next_element = driver.find_element_by_class_name(
+                    'next').click()
             except:
                 break
 
