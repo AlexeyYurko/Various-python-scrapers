@@ -19,7 +19,7 @@ def download_image(url):
     filename = os.path.join(out_dir, os.path.basename(url))
 
     if os.path.exists(filename):
-        print('Image %s already exists. Skipping download.' % filename)
+        print('Image {} already exists. Skipping download.'.format(filename))
         return
 
     try:
@@ -33,7 +33,7 @@ def download_image(url):
         with open(filename, 'wb') as handler:
             handler.write(image_data)
     except:
-        print('Warning: Failed to save image %s' % filename)
+        print('Warning: Failed to save image {}'.format(filename))
         return
 
 
@@ -61,7 +61,7 @@ def parse_boards(board):
     for page in range(1, 11):
         page_number = '/' + str(page) if page > 1 else ''
         url = (BASE_URL + board + page_number)
-        print('Extracting images URL from %s' % url)
+        print('Extracting images URL from {}'.format(url))
         soup = get_page(url)
         urls += get_links(soup)
 
@@ -81,7 +81,7 @@ def parse_boards(board):
 def Run():
     """main functinon"""
     if len(sys.argv) != 2:
-        print('Syntax: %s <board>' % sys.argv[0])
+        print('Syntax: {} <board>'.format(sys.argv[0]))
         sys.exit(0)
 
     board = sys.argv[1]
