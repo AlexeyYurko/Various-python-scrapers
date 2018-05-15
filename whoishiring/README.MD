@@ -1,4 +1,4 @@
-# Python script to extracting job listing from "Who is hiring" HN topic
+# Python script to extracting job listing from "Who is hiring" HN thread
 
 ### Usage:
 

@@ -1,5 +1,5 @@
 """
-get job listing from "Who is hiring" HN topic
+get job listing from "Who is hiring" HN thread
 """
 import json
 import codecs
@@ -7,21 +7,27 @@ import requests
 from tqdm import tqdm
 
 
-def getItemUrl(id):
-    """get storyID aka kids"""
-    return 'https://hacker-news.firebaseio.com/v0/item/{}.json'.format(str(id))
+def get_item_url(kid_id):
+    """get storyID aka kids
+    :param kid_id: int, thread/comment id
+    :return: dict
+    """
+    return 'https://hacker-news.firebaseio.com/v0/item/{}.json'.format(str(kid_id))
 
 
-def getComments(storyID):
-    """get all comments"""
-    story = requests.get(getItemUrl(storyID)).json()
-    comments = [requests.get(getItemUrl(c)).json()
-                for c in tqdm(story['kids'])]
-    return comments
+def get_comments(story_id):
+    """get all comments
+    :param story_id: int, main thread id
+    :return: list of dicts
+    """
+    story = requests.get(get_item_url(story_id)).json()
+    results = [requests.get(get_item_url(c)).json()
+               for c in tqdm(story['kids'])]
+    return results
 
 
-storyID = 16967543
-comments = getComments(storyID)
+thread_id = 16967543
+comments = get_comments(thread_id)
 
 with open("who-is-hiring-may-2018.json", "w") as f:
     json.dump(comments, f)
