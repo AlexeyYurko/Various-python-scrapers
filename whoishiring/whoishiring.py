@@ -25,7 +25,7 @@ def get_comments(kid_id):
     :return: dict
     """
     result = requests.get(get_item_url(kid_id)).json()
-    return result['text'] if 'text' in result else ''
+    return result['text'] if result and 'text' in result else ''
 
 
 def get_thread_name(thread_id):
@@ -99,7 +99,9 @@ def grab_new_comments(comments, all_kids):
     kids_to_add = [kid for kid in all_kids if kid not in kids_in_base]
 
     for kid in tqdm(kids_to_add):
-        comments.append(get_comments(kid))
+        next_comment = get_comments(kid)
+        if next_comment:
+            comments.append(next_comment)
         cur.execute('''INSERT INTO kids (kid) VALUES (?)''',
                     (kid, ))
         conn.commit()
