@@ -50,14 +50,14 @@ def make_html(job_listing, filename):
     """
     create simple html from comments with (and without) keyword
     """
-    remotes = [c for c in job_listing if c and ('REMOTE' in c or 'remote' in c)
-               and 'crypto' not in c]
+    remotes = [entry for entry in job_listing if entry and ('REMOTE' in entry or 'remote' in entry)
+               and 'crypto' not in entry]
 
-    with codecs.open(f'{filename}.html', "w", encoding="utf-8") as f:
-        f.write('<meta charset="utf-8">')
-        for c in remotes:
-            f.write(c)
-            f.write('<hr>')
+    with codecs.open(f'{filename}.html', "w", encoding="utf-8") as file:
+        file.write('<meta charset="utf-8">')
+        for entry in remotes:
+            file.write(entry)
+            file.write('<hr>')
     return
 
 
@@ -66,8 +66,8 @@ def load_from_json(filename):
     load json file from previous session (if exist)
     """
     try:
-        with open(f'{filename}.json', "r") as f:
-            saved_comments = json.load(f)
+        with open(f'{filename}.json', "r") as file:
+            saved_comments = json.load(file)
     except FileNotFoundError:
         saved_comments = []
     return saved_comments
@@ -77,8 +77,8 @@ def save_to_json(comments_to_save, filename):
     """
     save all comment to json file
     """
-    with open(f'{filename}.json', "w") as f:
-        json.dump(comments_to_save, f)
+    with open(f'{filename}.json', "w") as file:
+        json.dump(comments_to_save, file)
     return
 
 
