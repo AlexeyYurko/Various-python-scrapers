@@ -96,7 +96,7 @@ def grab_new_comments(comments, all_kids):
     except IndexError:
         kids_in_base = []
     kids_in_base = [kid[0] for kid in kids_in_base]
-    kids_to_add = [kid for kid in all_kids if kid not in kids_in_base]
+    kids_to_add = set(all_kids) - set(kids_in_base)
 
     for kid in tqdm(kids_to_add):
         next_comment = get_comments(kid)
