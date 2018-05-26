@@ -79,7 +79,7 @@ def parse_boards(board):
 
 
 def Run():
-    """main functinon"""
+    """main function"""
     if len(sys.argv) != 2:
         print('Syntax: {} <board>'.format(sys.argv[0]))
         sys.exit(0)
