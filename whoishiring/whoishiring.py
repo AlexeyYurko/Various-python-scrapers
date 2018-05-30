@@ -49,6 +49,7 @@ def get_kids(thread_id):
 def make_html(job_listing, filename):
     """
     create simple html from comments with (and without) keyword
+    TODO: allow to modify keywords via command line arguments or config file
     """
     remotes = [entry for entry in job_listing if entry and ('REMOTE' in entry or 'remote' in entry)
                and 'crypto' not in entry]
