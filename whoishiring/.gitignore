@@ -1,5 +1,2 @@
-.gitignore
-.DS_Store
 *.sqlite
-*.json
-*.html
+who*.html

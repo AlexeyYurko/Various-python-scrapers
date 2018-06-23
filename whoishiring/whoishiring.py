@@ -12,18 +12,13 @@ from tqdm import tqdm
 
 
 def get_item_url(kid_id):
-    """get storyID aka kids
-    :param kid_id: int, thread/comment id
-    :return: dict
+    """make url with kid_id
     """
     return 'https://hacker-news.firebaseio.com/v0/item/{}.json'.format(str(kid_id))
 
 
 def get_comments(kid_id):
-    """get all comments
-    :param story_id: int, main thread id
-    :return: dict
-    """
+    """get all comments"""
     result = requests.get(get_item_url(kid_id)).json()
     return result['text'] if result and 'text' in result else ''
 
@@ -34,32 +29,8 @@ def get_thread_name(thread_id):
     """
     story_name = requests.get(get_item_url(thread_id)).json()['title']
     month_year = re.findall(r'\(([A-Za-z]+ \d+)\)', story_name)[0].lower()
-    short_name = 'whoishiring {}'.format(month_year)
+    short_name = f'whoishiring {month_year}'
     return short_name
-
-
-def get_kids(thread_id):
-    """
-    get kids from story thread
-    """
-    story_kids = requests.get(get_item_url(thread_id)).json()['kids']
-    return story_kids
-
-
-def make_html(job_listing, filename):
-    """
-    create simple html from comments with (and without) keyword
-    TODO: allow to modify keywords via command line arguments or config file
-    """
-    remotes = [entry for entry in job_listing if entry and ('REMOTE' in entry or 'remote' in entry)
-               and 'crypto' not in entry]
-
-    with codecs.open(f'{filename}.html', "w", encoding="utf-8") as file:
-        file.write('<meta charset="utf-8">')
-        for entry in remotes:
-            file.write(entry)
-            file.write('<hr>')
-    return
 
 
 def load_from_json(filename):
@@ -74,13 +45,12 @@ def load_from_json(filename):
     return saved_comments
 
 
-def save_to_json(comments_to_save, filename):
+def get_kids(thread_id):
     """
-    save all comment to json file
+    get kids from story thread
     """
-    with open(f'{filename}.json', "w") as file:
-        json.dump(comments_to_save, file)
-    return
+    story_kids = requests.get(get_item_url(thread_id)).json()['kids']
+    return story_kids
 
 
 def grab_new_comments(comments, all_kids):
@@ -110,6 +80,35 @@ def grab_new_comments(comments, all_kids):
     return comments
 
 
+def make_html(job_listing, filename):
+    """
+    create simple html from comments with (and without) keyword
+    TODO: allow to modify keywords via command line arguments or config file
+    """
+    remotes = [entry for entry in job_listing if entry and ('REMOTE' in entry or 'remote' in entry)
+               and 'crypto' not in entry]
+    print(f'Written to html: {len(remotes)} job postings')
+    with open('template.html', 'r') as file:
+        template = file.read()
+    jobs_block = ''
+    for entry in remotes:
+        first_line = entry.split('<p>')[0]
+        details = '<br>'.join(entry.split('<p>')[1:])
+        jobs_block += f'<b>{first_line}</b><br>{details}<p><hr>'
+    with codecs.open(f'{filename}.html', "w", encoding="utf-8") as file:
+        file.write(template.format(filename, jobs_block))
+    return
+
+
+def save_to_json(comments_to_save, filename):
+    """
+    save all comment to json file
+    """
+    with open(f'{filename}.json', "w") as file:
+        json.dump(comments_to_save, file)
+    return
+
+
 def run():
     """
     main functinon
@@ -125,6 +124,6 @@ def run():
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
-        print('Syntax: {} <thread_id>'.format(sys.argv[0]))
+        print(f'Syntax: {sys.argv[0]} <thread_id>')
         sys.exit(0)
     run()
