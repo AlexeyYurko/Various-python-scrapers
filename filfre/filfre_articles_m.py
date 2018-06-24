@@ -139,9 +139,9 @@ def get_articles(folder):
 
 
 def run():
-    """main functinon"""
+    """main function"""
     if len(sys.argv) != 2:
-        print('Syntax: %s <folder>' % sys.argv[0])
+        print(f'Syntax: {sys.argv[0]} <folder>')
         sys.exit(0)
     to_folder = sys.argv[1]
     if not os.path.exists(to_folder):
