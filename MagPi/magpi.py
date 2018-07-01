@@ -7,8 +7,9 @@ https://www.raspberrypi.org/magpi-issues/MagPi68.pdf
 import multiprocessing
 import os
 import sys
-from fake_useragent import UserAgent
+
 import requests
+from fake_useragent import UserAgent
 
 BASE_URL = 'https://www.raspberrypi.org/magpi-issues/MagPi'
 
@@ -37,18 +38,22 @@ def download_file(urls_filename):
         return
 
 
-def Run():
+def run():
     """main function"""
+    min_issue_number = 1
     if len(sys.argv) == 1:
-        max_issue_number = 68  # for 05/30/2018
-    else:
+        max_issue_number = 71  # for 07/01/2018
+    elif len(sys.argv) == 2:
         max_issue_number = int(sys.argv[1])
+    else:
+        min_issue_number = int(sys.argv[1])
+        max_issue_number = int(sys.argv[2])
 
     urls_for_download = [('{}{:02}.pdf'.format(
-        BASE_URL, x), 'MagPi{:02}.pdf'.format(x)) for x in range(1, max_issue_number + 1)]
+        BASE_URL, x), 'MagPi{:02}.pdf'.format(x)) for x in range(min_issue_number, max_issue_number + 1)]
     pool = multiprocessing.Pool(processes=30)
     pool.map(download_file, urls_for_download)
 
 
 if __name__ == '__main__':
-    Run()
+    run()
