@@ -1,6 +1,7 @@
 """
 get job listing from "Who is hiring" HN thread
 may 2018 - 16967543
+july 2018 - 17442187
 """
 import json
 import codecs
@@ -92,9 +93,10 @@ def make_html(job_listing, filename):
         template = file.read()
     jobs_block = ''
     for entry in remotes:
-        first_line = entry.split('<p>')[0]
+        block_start = "<div class='job_entry'>"
+        first_line = f"<div class='job_head'>{entry.split('<p>')[0]}</div>"
         details = '<br>'.join(entry.split('<p>')[1:])
-        jobs_block += f'<b>{first_line}</b><br>{details}<p><hr>'
+        jobs_block += f'{block_start}{first_line}{details}<hr></div>'
     with codecs.open(f'{filename}.html', "w", encoding="utf-8") as file:
         file.write(template.format(filename, jobs_block))
     return
