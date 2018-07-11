@@ -3,23 +3,27 @@ get job listing from "Who is hiring" HN thread
 may 2018 - 16967543
 july 2018 - 17442187
 """
-import json
 import codecs
+import json
 import re
-import sys
 import sqlite3
+import sys
+
 import requests
 from tqdm import tqdm
 
 
 def get_item_url(kid_id):
-    """make url with kid_id
+    """
+    make url with kid_id
     """
     return 'https://hacker-news.firebaseio.com/v0/item/{}.json'.format(str(kid_id))
 
 
 def get_comments(kid_id):
-    """get all comments"""
+    """
+    get all comments
+    """
     result = requests.get(get_item_url(kid_id)).json()
     return result['text'] if result and 'text' in result else ''
 
@@ -84,7 +88,9 @@ def grab_new_comments(comments, all_kids):
 def make_html(job_listing, filename):
     """
     create simple html from comments with (and without) keyword
-    TODO: allow to modify keywords via command line arguments or config file
+    TODO: 
+    - allow to modify keywords via command line arguments or config file
+    - remake block for making html entries
     """
     remotes = [entry for entry in job_listing if entry and ('REMOTE' in entry or 'remote' in entry)
                and 'crypto' not in entry]
@@ -96,7 +102,7 @@ def make_html(job_listing, filename):
         block_start = "<div class='job_entry'>"
         first_line = f"<div class='job_head'>{entry.split('<p>')[0]}</div>"
         details = '<br>'.join(entry.split('<p>')[1:])
-        jobs_block += f'{block_start}{first_line}{details}<hr></div>'
+        jobs_block += f'{block_start}{first_line}{details}</div>'
     with codecs.open(f'{filename}.html', "w", encoding="utf-8") as file:
         file.write(template.format(filename, jobs_block))
     return
