@@ -32,7 +32,11 @@ def get_thread_name(thread_id):
     """
     extract name of the thread + month and year
     """
-    story_name = requests.get(get_item_url(thread_id)).json()['title']
+    try:
+        story_name = requests.get(get_item_url(thread_id)).json()['title']
+    except TypeError:
+        print(f'Thread {thread_id} non exist.')
+        exit()
     month_year = re.findall(r'\(([A-Za-z]+ \d+)\)', story_name)[0].lower()
     short_name = f'whoishiring {month_year}'
     return short_name
@@ -77,7 +81,9 @@ def grab_new_comments(comments, all_kids):
     for kid in tqdm(kids_to_add):
         next_comment = get_comments(kid)
         if next_comment:
-            comments.append(next_comment)
+            job_head = next_comment.split('<p>')[0]
+            job_description = '<br>'.join(next_comment.split('<p>')[1:])
+            comments.append({'head': job_head, 'description': job_description})
         cur.execute('''INSERT INTO kids (kid) VALUES (?)''',
                     (kid, ))
         conn.commit()
@@ -88,23 +94,24 @@ def grab_new_comments(comments, all_kids):
 def make_html(job_listing, filename):
     """
     create simple html from comments with (and without) keyword
-    TODO: 
+    TODO:
     - allow to modify keywords via command line arguments or config file
     - remake block for making html entries
     """
-    remotes = [entry for entry in job_listing if entry and ('REMOTE' in entry or 'remote' in entry)
-               and 'crypto' not in entry]
-    print(f'Written to html: {len(remotes)} job postings')
+    counter = 0
     with open('template.html', 'r') as file:
         template = file.read()
     jobs_block = ''
-    for entry in remotes:
-        block_start = "<div class='job_entry'>"
-        first_line = f"<div class='job_head'>{entry.split('<p>')[0]}</div>"
-        details = '<br>'.join(entry.split('<p>')[1:])
-        jobs_block += f'{block_start}{first_line}{details}</div>'
+    for i, entry in enumerate(job_listing, 1):
+        entry_text = f"{entry['head']} {entry['description']}"
+        if 'remote' in entry_text or 'REMOTE' in entry_text:
+            block_start = "<div class='job_entry'>"
+            first_line = f"<div class='job_head'><em>#{i}</em> {entry['head']}</div>"
+            jobs_block += f"{block_start}{first_line}{entry['description']}</div>"
+            counter += 1
     with codecs.open(f'{filename}.html', "w", encoding="utf-8") as file:
         file.write(template.format(filename, jobs_block))
+    print(f'Written to html: {counter} job postings.')
     return
 
 
@@ -132,6 +139,6 @@ def run():
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
-        print(f'Syntax: {sys.argv[0]} <thread_id>')
+        print(f'Syntax: {sys.argv[0]} <thread_id>.')
         sys.exit(0)
     run()
