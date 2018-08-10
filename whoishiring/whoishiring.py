@@ -69,7 +69,7 @@ def grab_new_comments(comments, all_kids):
     conn = sqlite3.connect('whoishiring.sqlite')
     cur = conn.cursor()
     cur.execute('''
-    CREATE TABLE IF NOT EXISTS kids (kid INTEGER UNIQE)''')
+    CREATE TABLE IF NOT EXISTS kids (kid INTEGER UNIQE, head BLOB, description BLOB)''')
     cur.execute("SELECT kid FROM kids")
     try:
         kids_in_base = cur.fetchall()
@@ -84,8 +84,8 @@ def grab_new_comments(comments, all_kids):
             job_head = next_comment.split('<p>')[0]
             job_description = '<br>'.join(next_comment.split('<p>')[1:])
             comments.append({'head': job_head, 'description': job_description})
-        cur.execute('''INSERT INTO kids (kid) VALUES (?)''',
-                    (kid, ))
+        cur.execute('''INSERT INTO kids (kid, head, description) VALUES (?, ?, ?)''',
+                    (kid, job_head, job_description, ))
         conn.commit()
     conn.close()
     return comments
@@ -112,7 +112,6 @@ def make_html(job_listing, filename):
     with codecs.open(f'{filename}.html', "w", encoding="utf-8") as file:
         file.write(template.format(filename, jobs_block))
     print(f'Written to html: {counter} job postings.')
-    return
 
 
 def save_to_json(comments_to_save, filename):
@@ -121,7 +120,6 @@ def save_to_json(comments_to_save, filename):
     """
     with open(f'{filename}.json', "w") as file:
         json.dump(comments_to_save, file)
-    return
 
 
 def run():
