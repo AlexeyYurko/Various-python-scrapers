@@ -137,6 +137,5 @@ def run():
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
-        print(f'Syntax: {sys.argv[0]} <thread_id>.')
-        sys.exit(0)
+        sys.exit(f'Syntax: {sys.argv[0]} <thread_id>')
     run()
