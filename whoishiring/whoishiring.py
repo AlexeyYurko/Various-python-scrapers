@@ -1,11 +1,9 @@
 """
 get job listing from "Who is hiring" HN thread
-may 2018 - 16967543
-july 2018 - 17442187
-january 2019 - 18807017
 """
 import codecs
 import json
+import pickle
 import re
 import sqlite3
 import sys
@@ -70,7 +68,9 @@ def grab_new_comments(comments, all_kids):
     """
     conn = sqlite3.connect('whoishiring.sqlite')
     cur = conn.cursor()
-    cur.execute('CREATE TABLE IF NOT EXISTS kids (kid INTEGER UNIQE, head BLOB, description BLOB)')
+    cur.execute('''CREATE TABLE IF NOT EXISTS kids(kid INTEGER UNIQE,
+                                                 head BLOB,
+                                                 description BLOB)''')
     cur.execute('SELECT kid FROM kids')
     try:
         kids_in_base = cur.fetchall()
@@ -85,7 +85,9 @@ def grab_new_comments(comments, all_kids):
             job_head = next_comment.split('<p>')[0]
             job_description = '<br>'.join(next_comment.split('<p>')[1:])
             comments.append({'head': job_head, 'description': job_description})
-            cur.execute('''INSERT INTO kids (kid, head, description) VALUES (?, ?, ?)''',
+            cur.execute('''INSERT INTO kids
+                            (kid, head, description)
+                            VALUES (?, ?, ?)''',
                         (kid, job_head, job_description,))
             conn.commit()
     conn.close()
@@ -123,11 +125,12 @@ def save_to_json(comments_to_save, filename):
         json.dump(comments_to_save, file)
 
 
-def run():
+def run(thread_id):
     """
     main functinon
     """
-    thread_id = sys.argv[1]
+    with open('last_thread.pickle', 'wb') as pickle_out:
+        pickle.dump(thread_id, pickle_out)
     name = get_thread_name(thread_id)
     old_comments = load_from_json(name)
     kids = get_kids(thread_id)
@@ -138,5 +141,12 @@ def run():
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
-        sys.exit(f'Syntax: {sys.argv[0]} <thread_id>')
-    run()
+        try:
+            # get last used thread_id
+            with open('last_thread.pickle', 'rb') as pickle_in:
+                thread_id = pickle.load(pickle_in)
+        except FileNotFoundError:
+            sys.exit(f'Syntax: {sys.argv[0]} <thread_id>')
+    else:
+        thread_id = sys.argv[1]
+    run(thread_id)
