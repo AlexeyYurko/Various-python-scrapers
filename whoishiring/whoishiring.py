@@ -27,15 +27,15 @@ def get_comments(kid_id):
     return result['text'] if result and 'text' in result else ''
 
 
-def get_thread_name(thread_id):
+def get_thread_name(from_thread_id):
     """
     extract name of the thread + month and year
     """
     story_name = ''
     try:
-        story_name = requests.get(get_item_url(thread_id)).json()['title']
+        story_name = requests.get(get_item_url(from_thread_id)).json()['title']
     except TypeError:
-        print(f'Thread {thread_id} non exist.')
+        print(f'Thread {from_thread_id} non exist.')
         exit()
     month_year = re.findall(r'\(([A-Za-z]+ \d+)\)', story_name)[0].lower()
     short_name = f'whoishiring {month_year}'
@@ -54,11 +54,11 @@ def load_from_json(filename):
     return saved_comments
 
 
-def get_kids(thread_id):
+def get_kids(thread_id_to_get_kids):
     """
     get kids from story thread
     """
-    story_kids = requests.get(get_item_url(thread_id)).json()['kids']
+    story_kids = requests.get(get_item_url(thread_id_to_get_kids)).json()['kids']
     return story_kids
 
 
@@ -125,15 +125,20 @@ def save_to_json(comments_to_save, filename):
         json.dump(comments_to_save, file)
 
 
-def run(thread_id):
-    """
-    main functinon
-    """
+def write_thread_id(thread_id_to_save):
     with open('last_thread.pickle', 'wb') as pickle_out:
-        pickle.dump(thread_id, pickle_out)
-    name = get_thread_name(thread_id)
+        pickle.dump(thread_id_to_save, pickle_out)
+
+
+def run(thread):
+    """
+    main block
+    """
+    write_thread_id(thread)
+    name = get_thread_name(thread)
     old_comments = load_from_json(name)
-    kids = get_kids(thread_id)
+    kids = get_kids(thread)
+    print(f'In thread {thread_id} by name "{name}" are {len(kids)} records')
     new_comments = grab_new_comments(old_comments, kids)
     make_html(new_comments, name)
     save_to_json(new_comments, name)
