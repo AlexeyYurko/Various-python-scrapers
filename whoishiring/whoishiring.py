@@ -81,15 +81,17 @@ def grab_new_comments(comments, all_kids):
 
     for kid in tqdm(kids_to_add):
         next_comment = get_comments(kid)
+        job_head = ''
+        job_description = ''
         if next_comment:
             job_head = next_comment.split('<p>')[0]
             job_description = '<br>'.join(next_comment.split('<p>')[1:])
             comments.append({'head': job_head, 'description': job_description})
-            cur.execute('''INSERT INTO kids
-                            (kid, head, description)
-                            VALUES (?, ?, ?)''',
-                        (kid, job_head, job_description,))
-            conn.commit()
+        cur.execute('''INSERT INTO kids
+                        (kid, head, description)
+                        VALUES (?, ?, ?)''',
+                    (kid, job_head, job_description,))
+        conn.commit()
     conn.close()
     return comments
 
