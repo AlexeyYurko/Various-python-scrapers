@@ -1,9 +1,14 @@
 """
 get job listing from "Who is hiring" HN thread
 
+TODO allow to store data of vacancy to make html based on month and year not on entire
+    base
+TODO remake job_head and job_description - for now it's a mess and generate
+    a ton of crazy html-like code with incorrect close/open tags
 TODO allow to modify keywords via command line arguments or config file
 TODO remake block for making html entries
 TODO rewrite API/BS4 block to single function
+
 """
 import argparse
 import codecs
@@ -75,6 +80,14 @@ def load_from_json(filename):
     except FileNotFoundError:
         saved_comments = []
     return saved_comments
+
+
+def save_to_json(comments_to_save, filename):
+    """
+    save all comment to json file
+    """
+    with open(f"{filename}.json", "w") as file:
+        json.dump(comments_to_save, file)
 
 
 def get_kids(thread_id_to_get_kids):
@@ -149,11 +162,10 @@ def grab_new_comments_html(comments, entrys):
         if kid in stored_kids:
             continue
 
-        job_head, job_description = '', ''
         try:
             job_head = re.findall(
                 r'.+c00">(.+)', text.__str__().split("<p>")[0])[0]
-            job_description = "<p>".join(text.__str__().split(
+            job_description = "<br><p>".join(text.__str__().split(
                 "<p>")[1:]).rstrip("</span>")
         except IndexError:
             continue
@@ -162,7 +174,9 @@ def grab_new_comments_html(comments, entrys):
                 continue
             else:
                 comments.append(
-                    {"head": job_head, "description": job_description})
+                    {"kid": kid,
+                     "head": job_head,
+                     "description": job_description})
                 cur.execute(
                     """INSERT INTO kids
                         (kid, head, description)
@@ -201,8 +215,10 @@ def grab_new_comments(comments, all_kids):
         job_description = ''
         if next_comment:
             job_head = next_comment.split("<p>")[0]
-            job_description = "<br>".join(next_comment.split("<p>")[1:])
-            comments.append({"head": job_head, "description": job_description})
+            job_description = "<br><p>".join(next_comment.split("<p>")[1:])
+            comments.append({"kid": kid,
+                             "head": job_head,
+                             "description": job_description})
         cur.execute(
             """INSERT INTO kids
                         (kid, head, description)
@@ -226,21 +242,14 @@ def make_html(job_listing, filename):
         entry_text = f"{entry['head']} {entry['description']}"
         if "remote" in entry_text.lower():
             block_start = "<div class='job_entry'>"
-            first_line = f"""<div class = 'job_head' > <em >  # {i}</em>
-                                {entry['head']} </div>"""
-            jobs_block += f"{block_start}{first_line}{entry['description']}</div>"
+            first_line = f"""<div class='job_head'><em># {i}</em>
+                             {entry['head']}</div>"""
+            jobs_block += f"""{block_start}{first_line}
+                              {entry['description']}</a></div>"""
             counter += 1
     with codecs.open(f"{filename}.html", "w", encoding="utf-8") as file:
         file.write(template.format(filename, jobs_block))
     print(f"Written to html: {counter} job postings.")
-
-
-def save_to_json(comments_to_save, filename):
-    """
-    save all comment to json file
-    """
-    with open(f"{filename}.json", "w") as file:
-        json.dump(comments_to_save, file)
 
 
 def write_thread_id(thread_id_to_save):
@@ -264,7 +273,7 @@ def get_page(url):
         url (string): address
 
     Returns:
-        [soup]: beautuful soup object
+        [soup]: beautiful soup object
     """
 
     response = requests.get(
@@ -300,7 +309,6 @@ def run(thread):
 
 
 if __name__ == "__main__":
-
     PARSER = create_parser()
     ARGS = PARSER.parse_args(sys.argv[1:])
 
