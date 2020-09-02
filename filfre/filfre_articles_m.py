@@ -77,12 +77,14 @@ def get_articles(folder):
             for image in article_images:
                 image_url = image.find('a').get('href')
                 try:
-                    image_text = image.find('p', {'class': 'wp-caption-text'}).text
+                    image_text = image.find(
+                        'p', {'class': 'wp-caption-text'}).text
                 except:
                     image_text = ''
                 passed.append(image_url)
                 # check for link to page, not the image itself
-                image_name, image_url = check_for_page(folder, image_count, image_url)
+                image_name, image_url = check_for_page(
+                    folder, image_count, image_url)
                 image_count += 1
                 image_load(image_url, image_name, image_text)
                 images_links.append(
@@ -131,9 +133,8 @@ def get_articles(folder):
                 'images': images_links,
             }
             collection.save(post)
-            pickle_out = open("image_count.pickle", "wb")
-            pickle.dump(image_count, pickle_out)
-            pickle_out.close()
+            with open("image_count.pickle", "wb") as pickle_out:
+                pickle.dump(image_count, pickle_out)
             print('Loaded and saved article "{}"\n'.format(article))
     return
 
