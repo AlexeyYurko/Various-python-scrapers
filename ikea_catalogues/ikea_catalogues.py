@@ -15,7 +15,7 @@ BASE_URL = 'https://ikeacatalogues.ikea.com/sv-{}/page/1'
 BASE_NAME = 'IKEA {}.pdf'
 OUT_DIR = 'pdfs'
 YEAR_START = 1950
-YEAR_END = 2020
+YEAR_END = 2021
 
 
 def get_page(url):
