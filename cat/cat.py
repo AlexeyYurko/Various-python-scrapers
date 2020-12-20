@@ -1,25 +1,40 @@
 """
 http://www.checkatrade.com
 """
+
 import sqlite3
 import time
+
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
-trades = ['Air conditioning', 'Alarms/security', 'Appliance services/Repair', 'Asbestos services',
-          'Bathrooms', 'Bedrooms', 'Blacksmith/Ironwork', 'Builder', 'Carpenter',
-          'Carpets/Flooring', 'Central Heating Engineer', 'Chimney Sweep', 'Cleaning services',
+trades = ['Air conditioning', 'Alarms/security', 'Appliance services/Repair',
+          'Asbestos services',
+          'Bathrooms', 'Bedrooms', 'Blacksmith/Ironwork', 'Builder',
+          'Carpenter',
+          'Carpets/Flooring', 'Central Heating Engineer', 'Chimney Sweep',
+          'Cleaning services',
           'Curtains/Blinds/Shutters', 'Damp proofer', 'Drain/Sewer clearance',
-          'Driveways/Patios/Paths', 'Electrician', 'Fencing/Gates', 'Fireplaces/Stoves',
-          'Flood protection/defence', 'Furniture repair/Restoration', 'Garage/Vehicle services',
-          'Garage doors', 'Garden services', 'Glass', 'Hire services', 'Home improvements',
-          'Hot tubs/spa', 'Household Water Treatment', 'Insulation', 'Kitchens',
-          'Landscaper', 'Locksmith', 'Lofts/Loft Ladders', 'Miscellaneous Services', 'Mobility',
-          'Motor homes', 'Painter/decorator', 'PAT testing', 'Pest/vermin control', 'Plasterer',
-          'Plumber', 'Removals/Storage', 'Renewable energy', 'Roofer', 'Rubbush/Waste/Clearance',
-          'Scaffolder', 'Shop fitting', 'Stonemason', 'Swimming pools', 'Taxi services',
-          'Telecommunications', 'Tiler - tiling', 'Towing/Transportation', 'Tree surgeon',
-          'TV aerial/Satellite services', 'Weather coatings', 'Windows/Doors/Conservatories']
+          'Driveways/Patios/Paths', 'Electrician', 'Fencing/Gates',
+          'Fireplaces/Stoves',
+          'Flood protection/defence', 'Furniture repair/Restoration',
+          'Garage/Vehicle services',
+          'Garage doors', 'Garden services', 'Glass', 'Hire services',
+          'Home improvements',
+          'Hot tubs/spa', 'Household Water Treatment', 'Insulation',
+          'Kitchens',
+          'Landscaper', 'Locksmith', 'Lofts/Loft Ladders',
+          'Miscellaneous Services', 'Mobility',
+          'Motor homes', 'Painter/decorator', 'PAT testing',
+          'Pest/vermin control', 'Plasterer',
+          'Plumber', 'Removals/Storage', 'Renewable energy', 'Roofer',
+          'Rubbush/Waste/Clearance',
+          'Scaffolder', 'Shop fitting', 'Stonemason', 'Swimming pools',
+          'Taxi services',
+          'Telecommunications', 'Tiler - tiling', 'Towing/Transportation',
+          'Tree surgeon',
+          'TV aerial/Satellite services', 'Weather coatings',
+          'Windows/Doors/Conservatories']
 
 count = 0
 
@@ -41,9 +56,7 @@ driver.get(main_url)
 time.sleep(1)
 
 for twn in towns:
-
     for trade in trades:
-
         search_field = driver.find_element_by_id('trade_autocomplete_input')
         search_field.clear()
         search_field.send_keys(trade)
@@ -56,11 +69,9 @@ for twn in towns:
         time.sleep(2)
 
         while True:
-
             lists = driver.find_elements_by_class_name("listing")
 
             for i in lists:
-
                 basic_info = i.find_element_by_class_name('results__title')
                 company_name = basic_info.text
                 url = basic_info.find_elements_by_css_selector(
@@ -72,8 +83,9 @@ for twn in towns:
                     (company_name, url))
                 try:
                     dattest = cur.fetchone()[0]
-                    print('[{}] With town: {} found in database company: {} at link {}'.format(
-                        count, twn[0], company_name, url))
+                    print(
+                        '[{}] With town: {} found in database company: {} at '
+                        'link {}'.format(count, twn[0], company_name, url))
                     continue
                 except:
                     pass
@@ -138,7 +150,7 @@ for twn in towns:
                 try:
                     address = driver.find_elements_by_xpath(
                         "//span[@itemprop='addressLocality']")
-                    town = ', '.join(list(adr.text for adr in address))
+                    town = ', '.join(adr.text for adr in address)
                 except:
                     pass
 
@@ -153,30 +165,36 @@ for twn in towns:
                 driver.switch_to.window(curWindowHndl)
 
                 count += 1
-                print('''[{}] Company {} of {}, with email {}, landline {}, mobile {}, trade {},
-                      town {}, region {}, postcode {}'''.format(count, company_name, person_name,
-                                                                email_address,
-                                                                landline_phone_number,
-                                                                mobile_phone_number, trade, town,
-                                                                region, postcode))
+                print('''[{}] Company {} of {}, with email {}, landline {}, 
+                mobile {}, trade {}, town {}, region {}, 
+                postcode {}'''.format(count,
+                                      company_name,
+                                      person_name,
+                                      email_address,
+                                      landline_phone_number,
+                                      mobile_phone_number,
+                                      trade, town,
+                                      region,
+                                      postcode))
 
                 cur.execute('''INSERT INTO cat (company_name, url, person_name, email_address,
                             landline_phone_number, mobile_phone_number, trade, town, region,
                             postcode, www )
                             VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-                            (company_name, url, person_name, email_address, landline_phone_number,
-                             mobile_phone_number, trade, town, region, postcode, www))
+                            (company_name, url, person_name, email_address,
+                             landline_phone_number,
+                             mobile_phone_number, trade, town, region,
+                             postcode, www))
                 conn.commit()
 
             print('Moving to next page')
             try:
                 next_element = driver.find_elements_by_class_name(
                     'pagination__prev-next')
-                if 'Next' in next_element[-1].text:
-                    next_element[-1].click()
-                    time.sleep(1)
-                else:
+                if 'Next' not in next_element[-1].text:
                     break
+                next_element[-1].click()
+                time.sleep(1)
             except:
                 break
 

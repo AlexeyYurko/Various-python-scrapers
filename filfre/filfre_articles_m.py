@@ -4,12 +4,13 @@ using MongoDB
 
 TODO: rewrite code to more readable
 """
-import pickle
 import os
+import pickle
 import sys
 from urllib.request import urlopen
-from bs4 import BeautifulSoup
+
 import requests
+from bs4 import BeautifulSoup
 from pymongo import MongoClient
 
 CLIENT = MongoClient()
@@ -26,7 +27,6 @@ def image_load(image_url, image_name, image_text):
     )
     with open(image_name, 'wb') as handler:
         handler.write(image_data)
-    return
 
 
 def check_for_page(folder, counter, image_url):
@@ -35,11 +35,13 @@ def check_for_page(folder, counter, image_url):
     )
     if image_name.endswith('_'):
         page = urlopen(image_url)
-        image_url = BeautifulSoup(page, 'lxml').find('p', {'class': 'attachment'}).find(
-            'img'
-        )[
-            'src'
-        ]
+        image_url = \
+            BeautifulSoup(page, 'lxml').find('p',
+                                             {'class': 'attachment'}).find(
+                'img'
+            )[
+                'src'
+            ]
         image_name = image_name + image_url.split('/')[-1]
     return image_name, image_url
 
@@ -136,7 +138,6 @@ def get_articles(folder):
             with open("image_count.pickle", "wb") as pickle_out:
                 pickle.dump(image_count, pickle_out)
             print('Loaded and saved article "{}"\n'.format(article))
-    return
 
 
 def run():

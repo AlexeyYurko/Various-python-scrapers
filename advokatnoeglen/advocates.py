@@ -5,8 +5,9 @@ Python code may be a little silly, but it works
 """
 # -*- coding: UTF-8 -*-
 
-from urllib.request import urlopen
 import re
+from urllib.request import urlopen
+
 from bs4 import BeautifulSoup
 
 
@@ -34,15 +35,17 @@ def check_mail(eml):
 
 
 DATA = open('Advokater.csv', 'w')
-DATA.write('''Page, URL, Name, Name2, Surname, Title, Title 2, Area, Beskikkelsesår, Fødselsår,
-            Møderet landsret, Møderet højesteret, Email, Mobile, Firma, Gade, Postnummer, By,
-            Land, Telefon, Email, CVR, WWW, Retskreds, Ansatte\n''')
+DATA.write('''Page, URL, Name, Name2, Surname, Title, Title 2, Area, 
+Beskikkelsesår, Fødselsår, Møderet landsret, Møderet højesteret, Email, 
+Mobile, Firma, Gade, Postnummer, By, Land, Telefon, Email, CVR, WWW, 
+Retskreds, Ansatte\n''')
 
 for page in range(0, 246):  # 246
 
     print('Getting data for ' + str(page) + ' page')
-    url = ("http://www.advokatnoeglen.dk/sog.aspx?s=1&t=1&zf=0000&zt=999999&p=" + str(page))
-    urlDetail = ("http://www.advokatnoeglen.dk")
+    url = f"http://www.advokatnoeglen.dk/sog.aspx?s=1&t=1&zf=0000&zt=999999" \
+          f"&p={page}"
+    urlDetail = "http://www.advokatnoeglen.dk"
     page_adv = urlopen(url)
     soup = BeautifulSoup(page_adv, 'html.parser')
     table = soup.findAll('tr')
@@ -102,20 +105,25 @@ for page in range(0, 246):  # 246
         email = check_mail(liame)  # email
         mobile = has_inside(re.findall(r'\.: ([+0-9]+)', work))  # mobile phone
         print('''Start: {}, birth: {}, @ highcourt: {}, @ supremecourt {}, email: {},
-              mobile: {}'''.format(start, birth, highcourt, supremecourt, email, mobile))
+              mobile: {}'''.format(start, birth, highcourt, supremecourt,
+                                   email, mobile))
 
         # works[2] - address
         dats = ' '.join(works[2].__str__().split())
-        adr1 = has_inside(re.findall(r'p>(.+?)<b', dats)).lstrip().rstrip()  # adr1
-        adr2 = has_inside(re.findall(r'/>(.+?)<b', dats)).lstrip().rstrip()  # adr2
+        adr1 = has_inside(
+            re.findall(r'p>(.+?)<b', dats)).lstrip().rstrip()  # adr1
+        adr2 = has_inside(
+            re.findall(r'/>(.+?)<b', dats)).lstrip().rstrip()  # adr2
 
         adrwork = adr2.split()
         postnumm = adrwork[0]
         by = ' '.join(adrwork[1:])
 
         country = has_inside(
-            re.findall(r'<p>[\S\s]+<br */>[\S\s]+<br */>([\S\s]+).+</p', dats)).lstrip().rstrip()
-        print('Address1: {}, address2: {}, country: {}'.format(adr1, adr2, country))
+            re.findall(r'<p>[\S\s]+<br */>[\S\s]+<br */>([\S\s]+).+</p',
+                       dats)).lstrip().rstrip()
+        print('Address1: {}, address2: {}, country: {}'.format(adr1, adr2,
+                                                               country))
 
         # works[3] - contacts
         cnt = works[3].__str__()
@@ -138,11 +146,17 @@ for page in range(0, 246):  # 246
             www, stafflawyers, retskreds))
         print()
 
-        stringToWrite = '''{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},
-                        {}\n'''.format(str(page), cut, name, name2, surname, title, title2, area,
-                                       start, birth, highcourt, supremecourt, email, mobile, firm,
-                                       adr1, postnumm, by, country, phone, email2, cvr, www,
-                                       retskreds, stafflawyers)
+        stringToWrite = '''{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},
+        {},{},{},{},{},{},{},{}, {}\n'''.format(str(page), cut, name, name2,
+                                                surname,
+                                                title, title2, area,
+                                                start, birth, highcourt,
+                                                supremecourt,
+                                                email, mobile, firm,
+                                                adr1, postnumm, by, country,
+                                                phone,
+                                                email2, cvr, www,
+                                                retskreds, stafflawyers)
 
         DATA.write(stringToWrite)
 

@@ -5,9 +5,10 @@ Free Volumes of Harvard Classics
 
 import multiprocessing
 import os
+
+import requests
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
-import requests
 
 BASE_URL = 'https://www.myharvardclassics.com/categories/20120212'
 
@@ -43,7 +44,8 @@ def download_file(url_filename):
 
 
 def get_urls_and_names(links):
-    """extract URL and filename from links list. Due to 'double' urls organization looks weird"""
+    """extract URL and filename from links list. Due to 'double' urls
+    organization looks weird """
     urls = []
     name = ''
     url = ''
@@ -58,7 +60,7 @@ def get_urls_and_names(links):
     return urls
 
 
-def Run():
+def run():
     """main block"""
     soup = get_page(BASE_URL)
     links = soup.find_all('a', href=True)
@@ -68,4 +70,4 @@ def Run():
 
 
 if __name__ == '__main__':
-    Run()
+    run()

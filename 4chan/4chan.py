@@ -3,12 +3,13 @@ download images from 4chan boards
 usage: 4chan.py board_name
 """
 
-import sys
-import os
 import multiprocessing
+import os
+import sys
+
+import requests
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
-import requests
 
 BASE_URL = 'https://boards.4chan.org/'
 
@@ -78,7 +79,7 @@ def parse_boards(board):
     return urls
 
 
-def Run():
+def run():
     """main function"""
     if len(sys.argv) != 2:
         print('Syntax: {} <board>'.format(sys.argv[0]))
@@ -95,4 +96,4 @@ def Run():
 
 
 if __name__ == '__main__':
-    Run()
+    run()

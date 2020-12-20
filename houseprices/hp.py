@@ -6,10 +6,11 @@ get selling price of houses from http://www.zoopla.co.uk
 
 import sqlite3
 import time
+from urllib.request import urlopen
+
+from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-from urllib.request import urlopen
-from bs4 import BeautifulSoup
 
 conn = sqlite3.connect('hp.sqlite')
 cur = conn.cursor()
@@ -25,7 +26,6 @@ urlsearch = 'http://www.zoopla.co.uk/house-prices/'
 driver = webdriver.Firefox()
 
 for house in houses:
-
     cur.execute("SELECT address FROM hp WHERE address= ?", (house[0],))
 
     try:
@@ -72,7 +72,8 @@ for house in houses:
 
         try:
             prc = soup.find("strong", {"class": "buyers"}).getText().strip()
-            price = ' '.join(prc[1:].replace(',', '').split()) if '£' in prc else ' '.join(
+            price = ' '.join(
+                prc[1:].replace(',', '').split()) if '£' in prc else ' '.join(
                 prc.replace(',', '').split())
         except:
             price = '-000'

@@ -1,7 +1,8 @@
-from googleplaces import GooglePlaces, types, lang
 import sqlite3
-from bs4 import BeautifulSoup
 import time
+
+from bs4 import BeautifulSoup
+from googleplaces import GooglePlaces
 
 scontext = None
 conn = sqlite3.connect('vape.db')
@@ -43,7 +44,8 @@ for city in cities:
         lon = float(place.geo_location.get('lng'))
 
         cur.execute(
-            '''SELECT name, Lat, Lon FROM places WHERE name=? AND Lat=? AND Lon=?''', (name, lat, lon, ))
+            '''SELECT name, Lat, Lon FROM places WHERE name=? AND Lat=? AND Lon=?''',
+            (name, lat, lon,))
 
         try:
             dattest = cur.fetchone()[0]
@@ -84,7 +86,8 @@ for city in cities:
         print('Writing {} at {}, {}, {}'.format(name, adr, cit, post))
 
         cur.execute('''INSERT INTO places (name, Lat, Lon, adr, city, postcode, phone_loc, phone_int, www)
-                    VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?)''', (name, lat, lon, adr, cit, post, phone_loc, phone_int, www))
+                    VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?)''', (
+            name, lat, lon, adr, cit, post, phone_loc, phone_int, www))
 
         conn.commit()
 
@@ -92,5 +95,5 @@ for city in cities:
         '''UPDATE cities SET scanned = 1 WHERE place = ?''', (city[0],))
     conn.commit()
 
-conn.close
+conn.close()
 print("\nDONE!!!")

@@ -111,7 +111,6 @@ driver.get(main_url)
 time.sleep(1)
 
 for town in towns:
-
     try:
         search_field = driver.find_element_by_id('searchBox')
         search_field.clear()
@@ -123,10 +122,8 @@ for town in towns:
         continue
 
     while True:
-
         lists = driver.find_elements_by_class_name("item")
         for i in lists:
-
             basic_info = i.find_elements_by_tag_name('p')
             info = i.text.split('\n')
             company = info[0]
@@ -141,8 +138,9 @@ for town in towns:
                 (company, address, postcode))
             try:
                 dattest = cur.fetchone()[0]
-                print('[{}] With town: {} found in database company: {} at {}'.format(
-                    count, town[0], company, address))
+                print(
+                    '[{}] With town: {} found in database company: {} at {}'.format(
+                        count, town[0], company, address))
                 continue
             except:
                 pass
@@ -174,14 +172,17 @@ for town in towns:
             count += 1
             print(
                 '[{}] Company {} at {}, {} with phone {}, mobile {}, fax {}, email {}, web {},\ntypes of service {}, business type {} and services {},\nwith contacts: {}, {}, {}, {}, {}'.format(
-                    count, company, address, postcode, telephone, mobile, fax, email, www, type_of_srv, buss_type,
-                    services, contact1, contact2, contact3, contact4, contact5))
+                    count, company, address, postcode, telephone, mobile, fax,
+                    email, www, type_of_srv, buss_type,
+                    services, contact1, contact2, contact3, contact4,
+                    contact5))
 
             cur.execute('''INSERT INTO surveyor (company, address, postcode, telephone, mobile, fax, email, www,
                                             type_of_srv, buss_type, services,
                                             contact1, contact2, contact3, contact4, contact5 )
                             VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-                        (company, address, postcode, telephone, mobile, fax, email, www,
+                        (company, address, postcode, telephone, mobile, fax,
+                         email, www,
                          type_of_srv, buss_type, services,
                          contact1, contact2, contact3, contact4, contact5))
             conn.commit()

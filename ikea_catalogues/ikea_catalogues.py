@@ -22,8 +22,7 @@ def get_page(url):
     """get page from url with requests and fake user agent"""
     response = requests.get(
         url, headers={'User-Agent': UserAgent().chrome}).text
-    pdf_url = re.findall(r'"downloadPdfUrl":"(.+.pdf)"', response)[0]
-    return pdf_url
+    return re.findall(r'"downloadPdfUrl":"(.+.pdf)"', response)[0]
 
 
 def download_file(urls_filename):

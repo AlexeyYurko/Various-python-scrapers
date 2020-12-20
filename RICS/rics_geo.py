@@ -1,6 +1,5 @@
 import sqlite3
 
-
 scontext = None
 
 count = 0
@@ -25,10 +24,11 @@ for entry in rics_cur:
     address = entry[1]
     postcode = entry[2].upper()
     if ' ' not in postcode:
-        postcode = postcode[:3]+' '+postcode[3:]
+        postcode = postcode[:3] + ' ' + postcode[3:]
 
     geo_cur.execute(
-        "SELECT company, address FROM surveyor_geo WHERE company= ? AND address=? AND postcode=?", (company, address, postcode))
+        "SELECT company, address FROM surveyor_geo WHERE company= ? AND address=? AND postcode=?",
+        (company, address, postcode))
     try:
         dattest = geo_cur.fetchone()[0]
         print('Skip {} {}'.format(company, address))
@@ -46,7 +46,7 @@ for entry in rics_cur:
     services = entry[10]
     contact1, contact2, contact3, contact4, contact5 = entry[11:]
 
-    geo_cur.execute('SELECT * FROM pc_short WHERE Postcode = ? ', (postcode, ))
+    geo_cur.execute('SELECT * FROM pc_short WHERE Postcode = ? ', (postcode,))
     geo_info = geo_cur.fetchone()
 
     try:
@@ -71,10 +71,11 @@ for entry in rics_cur:
                                             ward, country, region,telephone, mobile, fax, email, www,
                                     type_of_srv, buss_type, services,
                                     contact1, contact2, contact3, contact4, contact5 )
-                    VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?)''', (company, address, postcode, county, district,
-                                                                                             ward, country, region, telephone, mobile, fax, email, www,
-                                                                                             type_of_srv, buss_type, services,
-                                                                                             contact1, contact2, contact3, contact4, contact5))
+                    VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?)''',
+                    (company, address, postcode, county, district,
+                     ward, country, region, telephone, mobile, fax, email, www,
+                     type_of_srv, buss_type, services,
+                     contact1, contact2, contact3, contact4, contact5))
     geo.commit()
 
 geo.close()

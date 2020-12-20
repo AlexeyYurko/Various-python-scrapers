@@ -1,9 +1,10 @@
 # -*- coding: UTF-8 -*-
 
-from urllib.request import urlopen
+import re
 import sqlite3
 import time
-import re
+from urllib.request import urlopen
+
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -33,10 +34,10 @@ driver.get(main_url)
 time.sleep(1)
 
 driver.find_element_by_xpath(
-    "//select[@id='body_umbBodyContent_BranchSearch_1_ddlRadius']/option[@value='5']").click()
+    "//select[@id='body_umbBodyContent_BranchSearch_1_ddlRadius']/option["
+    "@value='5']").click()
 
 for town in towns:
-
     try:
         search_field = driver.find_element_by_id(
             'body_umbBodyContent_BranchSearch_1_txtLocation')
@@ -59,13 +60,15 @@ for town in towns:
             (company, city))
         try:
             dattest = cur.fetchone()[0]
-            print('[{}] With town: {} found in database company: {} at city: {}'.format(
-                count, town[0], company, city))
+            print(
+                '[{}] With town: {} found in database company: {} at city: {}'.format(
+                    count, town[0], company, city))
             continue
         except:
             pass
 
-        url_detail = i.find_elements_by_css_selector('a')[0].get_attribute('href')
+        url_detail = i.find_elements_by_css_selector('a')[0].get_attribute(
+            'href')
         page = urlopen(url_detail)
         soup = BeautifulSoup(page, 'html.parser')
 
@@ -78,7 +81,8 @@ for town in towns:
 
         contacts_group = soup.find("div", {"id": "contact_points_container"})
         cg = contacts_group.getText().strip()
-        phone = has_inside(re.findall(r'Telephone:[\s]+([\d]+.[\d]+.[\d]+)', cg))
+        phone = has_inside(
+            re.findall(r'Telephone:[\s]+([\d]+.[\d]+.[\d]+)', cg))
         fax = has_inside(re.findall(r'Fax:[\s]+([\d]+.[\d]+.[\d]+)', cg))
         email = has_inside(re.findall(r'([\S]+@[\S]+)', cg))
         www = has_inside(re.findall(r'Website:[\s]+(www.+)', cg))
@@ -105,14 +109,18 @@ for town in towns:
             empl2LN = ''
 
         count += 1
-        print('[{}]'.format(count), company_long, address, postcode, phone, fax, email, www, empl1T, empl1FN, empl1LN,
+        print('[{}]'.format(count), company_long, address, postcode, phone,
+              fax, email, www, empl1T, empl1FN, empl1LN,
               empl2T, empl2FN, empl2LN)
 
         cur.execute('''INSERT INTO estate (company_short, company, city, address, postcode, telephone, fax, email, www,
                     empl1T, empl1FN, empl1LN, empl2T, empl2FN, empl2LN) 
                     VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-                    (company, company_long, city, address, postcode, phone, fax, email, www, empl1T, empl1FN,
-                     empl1LN, empl2T, empl2FN, empl2LN))
+                    (
+                        company, company_long, city, address, postcode, phone,
+                        fax,
+                        email, www, empl1T, empl1FN,
+                        empl1LN, empl2T, empl2FN, empl2LN))
         conn.commit()
 
     cur.execute(

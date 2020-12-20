@@ -11,7 +11,9 @@ import requests
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 
-BASE_URL = 'http://www.evenfallstudios.com/woodworks_library/woodworks_library.html'
+# Obsolete url
+BASE_URL = 'http://www.evenfallstudios.com/woodworks_library' \
+           '/woodworks_library.html '
 OUT_DIR = 'pdfs'
 
 
@@ -61,7 +63,6 @@ def get_urls_and_names(links):
 
 
 def run():
-    """main function"""
     page = get_page(BASE_URL)
     links = page.find_all('a', href=True)
     urls_files = get_urls_and_names(links)

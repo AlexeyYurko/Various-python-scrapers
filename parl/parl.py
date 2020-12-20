@@ -1,8 +1,9 @@
 # -*- coding: UTF-8 -*-
 
-from bs4 import BeautifulSoup
-from urllib.request import urlopen
 import re
+from urllib.request import urlopen
+
+from bs4 import BeautifulSoup
 from selenium import webdriver
 
 
@@ -31,7 +32,6 @@ data.write('Name, e-mail\n')
 
 driver = webdriver.Firefox()
 
-
 url = 'http://www.parliament.uk/mps-lords-and-offices/mps/'
 page = urlopen(url)
 soup = BeautifulSoup(page, 'html.parser')
@@ -45,16 +45,19 @@ for line in table[2:]:
 
     driver.get(link)
     nm = driver.find_element_by_id('breadcrumb')
-    name = re.findall('You are here: Parliament home pageMPs, Lords & officesMPs([\\s\\S]+)', nm.text)[0]
+    name = re.findall(
+        'You are here: Parliament home pageMPs, Lords & officesMPs([\\s\\S]+)',
+        nm.text)[0]
     print(name)
     try:
-        eml = driver.find_element_by_id('ctl00_ctl00_FormContent_SiteSpecificPlaceholder_PageContent_addParliamentaryAddress_rptAddresses_ctl00_pnlEmail')
+        eml = driver.find_element_by_id(
+            'ctl00_ctl00_FormContent_SiteSpecificPlaceholder_PageContent_addParliamentaryAddress_rptAddresses_ctl00_pnlEmail')
         email = eml.text[7:]
     except:
         email = 'none'
     print(email)
     stringToWrite = (
-        str(name) + ',' + str(email) + '\n')
+            str(name) + ',' + str(email) + '\n')
 
     data.write(stringToWrite)
 

@@ -1,10 +1,11 @@
 # -*- coding: UTF-8 -*-
 
-from bs4 import BeautifulSoup
-from urllib.request import urlopen
-import urllib.request
 import re
 import sqlite3
+import urllib.request
+from urllib.request import urlopen
+
+from bs4 import BeautifulSoup
 
 
 def comma(block):
@@ -33,14 +34,14 @@ cur = conn.cursor()
 cur.execute('''
 CREATE TABLE IF NOT EXISTS spa (url TEXT, name DATE, address TEXT, phone TEXT, email TEXT, www TEXT, facebook TEXT, twitter)''')
 
-urlbase = 'http://www.spaweek.com/spas/all-spas/0/?keywords=spa&t=&results=50&sort=&treatment=&p='
+urlbase = 'http://www.spaweek.com/spas/all-spas/0/?keywords=spa&t=&results' \
+          '=50&sort=&treatment=&p= '
 urldetail = "http://www.spaweek.com"
 
 start_page = 1
 end_page = 70  # 70
 
 for page in range(start_page, end_page + 1):
-
     print('Getting data for {} page'.format(page))
     url = (urlbase + str(page))
     page_adv = urlopen(url)
@@ -95,11 +96,14 @@ for page in range(start_page, end_page + 1):
         eml = get_social(soupDetail.find("li", {"class": "email"}))
         email = has_inside(re.findall('mailto:(.+)', eml))
 
-        print("Address: {}, phone: {}, www: {}, email: {}, facebook: {}, twitter: {}".format(
-            adr, phone, wwwF, email, facebook, twitter))
+        print(
+            "Address: {}, phone: {}, www: {}, email: {}, facebook: {}, "
+            "twitter: {}".format(
+                adr, phone, wwwF, email, facebook, twitter))
 
         cur.execute('''INSERT INTO spa (url, name, address, phone, email, www, facebook, twitter)
-                    VALUES ( ?, ?, ?, ?, ?, ?, ?, ?)''', (cut, name, adr, phone, email, wwwF, facebook, twitter))
+                    VALUES ( ?, ?, ?, ?, ?, ?, ?, ?)''',
+                    (cut, name, adr, phone, email, wwwF, facebook, twitter))
 
         conn.commit()
 

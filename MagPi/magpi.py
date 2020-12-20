@@ -50,7 +50,8 @@ def run():
         max_issue_number = int(sys.argv[2])
 
     urls_for_download = [('{}{:02}.pdf'.format(
-        BASE_URL, x), 'MagPi{:02}.pdf'.format(x)) for x in range(min_issue_number, max_issue_number + 1)]
+        BASE_URL, x), 'MagPi{:02}.pdf'.format(x)) for x in
+        range(min_issue_number, max_issue_number + 1)]
     pool = multiprocessing.Pool(processes=30)
     pool.map(download_file, urls_for_download)
 
