@@ -1,5 +1,5 @@
 """
-Batch download Byte Magazines (1950 - 2020 years) from Vintage Ap[pleIkea Museum
+Batch download Byte Magazines (1950 - 2020 years) from Vintage Apple Museum
 https://vintageapple.org/byte/
 """
 
