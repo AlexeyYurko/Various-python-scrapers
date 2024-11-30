@@ -1,6 +1,6 @@
 """
 Batch download MagPi Magazine
-Issue from 1 to 68 for May 30, 2018
+Issue from 1 to 147 for Dec 01 2024
 https://www.raspberrypi.org/magpi-issues/MagPi68.pdf
 """
 
