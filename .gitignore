@@ -6,3 +6,4 @@ who*.html
 .idea/
 .DS_Store
 whoishiring/last_thread.pickle
+.ruff_cache/

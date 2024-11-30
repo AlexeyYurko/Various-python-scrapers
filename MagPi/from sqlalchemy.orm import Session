@@ -1,0 +1,98 @@
+from sqlalchemy.orm import Session
+from fastapi import HTTPException
+from sqlalchemy import select
+from sqlalchemy.exc import NoResultFound
+from starlette import status
+from app.models import CollectionLocalizedTitle, Row, RowLocalizedTitle, Language
+from app.config import DEFAULT_LANGUAGE_CODE
+from typing import List
+
+# Renamed to Localization to match Python's class naming standard
+class Localization:
+    def __init__(self, db: Session):
+        self.db = db
+        
+    def update_localized_titles(self, entity: any, names_payload: List[any]) -> None:
+        """ 
+        This function is used to update entity's localized titles
+        
+        Args:
+            entity (any): Instance of the entity to which the titles belong. 'Row' or 'Collection'
+            names_payload (List[any]): List of localized titles to update
+        Returns:
+            None
+        """
+        if not names_payload:  # Using implicit booleaness of empty lists
+            return
+
+        for payload_record in names_payload:
+            self._update_or_create_localized_title(entity, payload_record)
+     
+    def _update_or_create_localized_title(self, entity: any,  payload_record: any) -> None:
+        """
+        This function creates a new row or update an existent.
+        
+        Args:
+            entity (any): Instance of the entity to which the title belongs. 'Row' or 'Collection'
+            payload_record (any): Localized title to update
+        Returns:
+            None
+        """
+        # Split the complicated function into two: create and update 
+        existing_localized_record = self._get_existing_localized_title(entity, payload_record.language_code)
+        if existing_localized_record is not None:
+            existing_localized_record.title = payload_record.title
+        else:
+            self._create_localized_title(entity, payload_record)
+
+    @staticmethod
+    def _get_existing_localized_title(entity: any, language_code: str):   
+        """ 
+        This function aims to simplify the code and make it more readable
+        """
+        return next(
+            (localized_title for localized_title in entity.localized_titles if
+             localized_title.language_code == language_code),
+            None
+        )
+        
+    def _create_localized_title(self, entity: any, payload_record: any) -> None:
+        """ 
+        This helper function is to create localized_title based on entity type 
+        """
+        if isinstance(entity, Row):
+            new_localized_title = RowLocalizedTitle(title=payload_record.title, language_code=payload_record.language_code)
+        else:
+            new_localized_title = CollectionLocalizedTitle(title=payload_record.title, language_code=payload_record.language_code)
+            
+        entity.localized_titles.append(new_localized_title)
+
+    def make_localized_titles(self, entity: any, payload: any) -> list:
+        """ 
+        This function creates a list of entity's localized titles
+
+        Args:
+            entity (any): Instance of the entity to which the titles belong. 'Row' or 'Collection'
+            payload (any): Input payload data
+        Returns:
+            list [LocalizedTitles]: List of entity's localized titles
+        """
+        if not payload.localized_titles:
+            return [entity(title=payload.name, language_code=DEFAULT_LANGUAGE_CODE)]
+        
+        localized_titles = []
+
+        for record in payload.localized_titles:
+            self._exist_language(record.language_code)
+            localized_titles.append(entity(title=record.title, language_code=record.language_code))
+        return localized_titles
+    
+    def _exist_language(self, language_code: str) -> None:
+        """
+        This helper function is used to verify if language already exist 
+        """
+        try:
+            self.db.scalars(select(Language).where(Language.code == language_code)).one()
+        except NoResultFound as e:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                                detail=f'Language code {language_code} not found') from e
