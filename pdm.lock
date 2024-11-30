@@ -5,7 +5,7 @@
 groups = ["default"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:fd1fc57eed1a76bcebfa9603e9d59d33a40701a676e8905562c7dc84d1234a52"
+content_hash = "sha256:df375a295563d14eca63ca8fddb31a38b3b80bebe1afa4fe2b92560cf0dac89b"
 
 [[metadata.targets]]
 requires_python = "==3.12.*"
@@ -112,6 +112,20 @@ marker = "platform_system == \"Windows\""
 files = [
     {file = "colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
+]
+
+[[package]]
+name = "fake-useragent"
+version = "1.5.1"
+summary = "Up-to-date simple useragent faker with real world database"
+groups = ["default"]
+dependencies = [
+    "importlib-metadata~=4.0; python_version < \"3.8\"",
+    "importlib-resources>=5.0; python_version < \"3.10\"",
+]
+files = [
+    {file = "fake-useragent-1.5.1.tar.gz", hash = "sha256:6387269f5a2196b5ba7ed8935852f75486845a1c95c50e72460e6a8e762f5c49"},
+    {file = "fake_useragent-1.5.1-py3-none-any.whl", hash = "sha256:57415096557c8a4e23b62a375c21c55af5fd4ba30549227f562d2c4f5b60e3b3"},
 ]
 
 [[package]]
